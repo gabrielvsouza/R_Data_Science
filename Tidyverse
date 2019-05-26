@@ -1,0 +1,355 @@
+# The gapminder dataset
+library(gapminder)
+library(dplyr)
+head(gapminder)
+
+######The filter verb
+# filtering for one year
+gapminder %>% filter(year == 2007)
+gapminder %>% filter(country == "United States")
+gapminder %>% filter(country == "Brazil")
+gapminder %>% filter(year == 2007, country == "United States")
+gapminder_1952_2007 <- gapminder %>%
+  filter(year >= 1952 & year <= 1997)
+gapminder_1952_2007
+
+##### The arrange verb
+# sort ascending
+gapminder %>% arrange(gdpPercap)
+# sort descending
+gapminder %>% arrange(desc(gdpPercap))
+
+  
+##### The mutate verb
+gapminder %>%
+  mutate(pop = pop / 1000000)
+# Add new variable
+gapminder %>%
+  mutate(gdp = gdpPercap * pop)
+# mutate to change lifeExp to be in months
+gapminder %>%
+  mutate(lifeExp = lifeExp *12)
+# mutate to CREATE a new column called lifeExpMonths
+gapminder %>%
+  mutate(lifeExpMonths = lifeExp * 12)
+
+
+### Combining verbs
+gapminder %>%
+  mutate(gdp = gdpPercap * pop) %>%
+  filter(year == 2007) %>%
+  arrange(desc(gdp))
+### Combine filter and arrange
+gapminder %>%
+  filter(year == 2007) %>%
+  arrange(desc(gdpPercap))
+
+
+
+#### Visualizing with ggplot2
+# Variable Assignment
+gapminder_2007 <- gapminder %>%
+  filter(year == 2007)
+gapminder_2007
+library(ggplot2)
+ggplot(gapminder_2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point()
+
+
+
+###### Log scales
+ggplot(gapminder_2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() + scale_x_log10()
+# plot to put the x-axis on a log scale
+# Notice the points are more spread out on the x-axis. This makes it easy to see that 
+# there isn't a correlation between population and life expectancy.
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952)
+ggplot(gapminder_1952, aes(x = pop, y = lifeExp)) + 
+  geom_point() + 
+  scale_x_log10()
+# Putting the x- and y- axes on a log scale
+# Scatter plot comparing pop and gdpPercap, with both axes on a log scale
+# he y-axis goes from 1e3 (1000) to 1e4 (10,000) to 1e5 (100,000) in equal increments.
+ggplot(gapminder_1952, aes(x = pop, y = gdpPercap)) +
+  geom_point() + 
+  scale_x_log10() + scale_y_log10()
+
+
+
+##### Additional aesthetics
+# Adding size and color to a plot
+ggplot(gapminder_2007, aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
+  geom_point() + scale_x_log10()
+# adding country names
+# "need improvements"
+ggplot(gapminder_2007, aes(x = gdpPercap, y = lifeExp, color = continent, 
+  size = pop, label = country)) +
+  geom_point() + scale_x_log10() +
+  geom_text(nudge_x = 0.075)
+# Add the size aesthetic to represent a country's gdpPercap
+# Modify the scatter plot so that the size of the points represents 
+# each country's GDP per capita (gdpPercap)
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952)
+ggplot(gapminder_1952, aes(x =pop, y = lifeExp, color = continent, size = gdpPercap)) +
+  geom_point() +
+  scale_x_log10()
+
+
+##### Faceting
+ggplot(gapminder_2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() + scale_x_log10() +
+  facet_wrap(~ continent)
+### Creating a subgraph for each continent
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952)
+# Scatter plot comparing pop and lifeExp, faceted by continent
+ggplot(gapminder_1952, aes(x = pop, y = lifeExp)) + 
+  geom_point() + scale_x_log10() +
+  facet_wrap(~ continent)
+### Faceting by year
+# create a graph showing all the country-level data from 1952 to 2007, 
+# to understand how global statistics have changed over time.
+# Scatter plot comparing gdpPercap and lifeExp, with color representing continent
+# and size representing population, faceted by year
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
+  geom_point() + scale_x_log10() + facet_wrap(~ year)
+
+
+##### The summarize verb
+# summarize() turns many rows into one
+gapminder %>%
+  summarize(meanLifeExp = mean(lifeExp))
+# summarizing one year
+gapminder %>% 
+  filter(year == 2007) %>%
+  summarize(meanLifeExp = mean(lifeExp))
+# summaring into multiple columns
+gapminder %>% 
+  filter(year == 2007) %>%
+  summarize(meanLifeExp = mean(lifeExp), 
+            totalPop = sum(pop))
+# Summarizing the median life expectancy
+gapminder %>%
+  summarize(medianLifeExp = median(lifeExp))
+# Summarizing the median life expectancy in 1957
+gapminder %>%
+  filter(year == 1957) %>%
+  summarize(medianLifeExp = median(lifeExp))
+# Summarizing multiple variables in 1957
+# Filter for 1957 then summarize the median life expectancy and the maximum GDP per capita
+gapminder %>%
+  filter(year == 1957) %>%
+  summarize(medianLifeExp = median(lifeExp), maxGdpPercap = max(gdpPercap))
+
+
+##### The group_by verb
+# group_by() before summarize() turns groups into a one row each
+gapminder %>% 
+  group_by(year) %>%
+  summarize(meanLifeExp = mean(lifeExp), 
+            totalPop = sum(as.numeric(pop)))
+# summarizing by continent
+gapminder %>% 
+  filter(year == 2007) %>%
+  group_by(continent) %>%
+  summarize(meanLifeExp = mean(lifeExp), 
+            totalPop = sum(as.numeric(pop)))
+# summarizing by year and continent
+gapminder %>% 
+  group_by(year, continent) %>%
+  summarize(meanLifeExp = mean(lifeExp), 
+            totalPop = sum(as.numeric(pop)))
+# Find median life expectancy and maximum GDP per capita in each year
+gapminder %>% 
+  group_by(year) %>%
+  summarize(medianLifeExp = median(lifeExp), 
+            maxGdpPercap = max(gdpPercap))
+# Find median life expectancy and maximum GDP per capita in each continent in 1957
+gapminder %>% 
+  filter(year == 1957) %>%
+  group_by(continent) %>%
+  summarize(medianLifeExp = median(lifeExp), 
+            maxGdpPercap = max(gdpPercap))
+# Find median life expectancy and maximum GDP per capita in each continent/year combination
+gapminder %>% 
+  group_by(continent, year) %>%
+  summarize(medianLifeExp = median(lifeExp), 
+            maxGdpPercap = max(gdpPercap))
+# year/continent
+gapminder %>% 
+  group_by(year, continent) %>%
+  summarize(medianLifeExp = median(lifeExp), 
+            maxGdpPercap = max(gdpPercap))
+
+
+##### Visualizing summarized data
+by_year <-  gapminder %>% 
+            group_by(year) %>%
+            summarize(totalPop = sum(as.numeric(pop), 
+                      meanLifeExp = mean(lifeExp)))
+ggplot(by_year, aes(x = year, y = totalPop )) + 
+  geom_point()
+# Starting y-axis at zero
+ggplot(by_year, aes(x = year, y = totalPop )) + 
+  geom_point() +
+  expand_limits(y = 0)
+# summarizing by year and continent
+by_year_continent <- gapminder %>% 
+                      group_by(year, continent) %>%
+                      summarize(meanLifeExp = mean(lifeExp), 
+                                totalPop = sum(as.numeric(pop)))
+# Visualizing Population by year and continent
+ggplot(by_year_continent, 
+        aes(x = year, y = totalPop, color = continent )) + 
+        geom_point() +
+        expand_limits(y = 0)
+# Visualizing median life expectancy over time
+by_year <- gapminder %>%
+  group_by(year) %>%
+  summarize(medianLifeExp = median(lifeExp),
+            maxGdpPercap = max(gdpPercap))
+# Create a scatter plot showing the change in medianLifeExp over time
+ggplot(by_year, aes(x = year, y = medianLifeExp)) +
+  geom_point() +
+  expand_limits(y = 0)
+# Visualizing median GDP per capita per continent over time
+# Summarize medianGdpPercap within each continent within each year: by_year_continent
+by_year_continent <- gapminder %>% 
+  group_by(continent, year) %>%
+  summarize(medianGdpPercap = median(gdpPercap))
+by_year_continent
+# Plot the change in medianGdpPercap in each continent over time
+ggplot(by_year_continent, 
+       aes(x = year, y = medianGdpPercap, color = continent)) +
+  geom_point() + expand_limits(y = 0)
+# Summarize the median GDP and median life expectancy per continent in 2007
+by_continent_2007 <- gapminder %>%
+  filter(year == 2007) %>%
+  group_by(continent) %>%
+  summarize(medianLifeExp = median(lifeExp), 
+            medianGdpPercap = median(gdpPercap))
+by_continent_2007
+# Use a scatter plot to compare the median GDP and median life expec tancy
+ggplot(by_continent_2007, 
+       aes(x = medianGdpPercap, y = medianLifeExp, color = continent)) +
+  geom_point()
+
+
+##### Line plots
+# Visualizing median GDP per capita over time
+# Summarize the median gdpPercap by year, then save it as by_year
+by_year <- gapminder %>%
+  group_by(year) %>%
+  summarize(medianGdpPercap = median(gdpPercap))
+# Create a line plot showing the change in medianGdpPercap over time
+ggplot(by_year, aes(x = year, y = medianGdpPercap, )) +
+  geom_line() +
+  expand_limits (y = 0)
+# Visualizing median GDP per capita by continent over time
+# Summarize the median gdpPercap by year & continent, save as by_year_continent
+by_year_continent <- gapminder %>%
+  group_by(year, continent) %>%
+  summarize(medianGdpPercap = median(gdpPercap))
+
+# Create a line plot showing the change in medianGdpPercap by continent over time
+ggplot(by_year_continent, 
+       aes(x = year, y = medianGdpPercap, color = continent)) +
+  geom_line() + 
+  expand_limits (y = 0)
+
+
+###### Bar plots
+# Summarize the median gdpPercap by year and continent in 1952
+by_continent <- gapminder%>%
+  filter(year == 1952) %>%
+  group_by(continent) %>%
+  summarize(medianGdpPercap = median(gdpPercap))
+# Create a bar plot showing medianGdp by continent
+ggplot(by_continent, aes(x = continent, y = medianGdpPercap)) +
+  geom_col()
+# Visualizing GDP per capita by country in Oceania
+# Filter for observations in the Oceania continent in 1952
+oceania_1952 <- gapminder%>%
+  filter(year == 1952 & continent == "Oceania") 
+oceania_1952
+# Create a bar plot of gdpPercap by country
+ggplot(oceania_1952, aes(x = country, y = gdpPercap)) +
+  geom_col()
+
+
+###### Histograms
+gapminder_2007 <- gapminder %>%
+  filter(year == 2007)
+ggplot(gapminder_2007, aes(x = lifeExp)) +
+  geom_histogram()
+# Visualizing population
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952)
+#  that most of the distribution is in the smallest (leftmost) bins
+# Create a histogram of population (pop)
+ggplot(gapminder_1952, aes(x = pop)) +
+  geom_histogram()
+# Visualizing population with x-axis on a log scale
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952)
+# Create a histogram of population (pop), with x on a log scale
+# Notice that on a log scale, the distribution of country populations is 
+# approximately symmetrical.
+ggplot(gapminder_1952, aes(x = pop)) +
+  geom_histogram() +
+  scale_x_log10()
+
+
+
+##### Boxplots
+ggplot(gapminder_2007, aes(x = continent, y = lifeExp)) +
+  geom_boxplot()
+# Comparing GDP per capita across continents
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952)
+# Create a boxplot comparing gdpPercap among continents
+ggplot(gapminder_1952, aes(x = continent, y = gdpPercap)) +
+  geom_boxplot() +
+  scale_y_log10()
+
+
+
+###### Adding a title to your graph
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952)
+# Add a title to this graph: "Comparing GDP per capita across continents"
+ggplot(gapminder_1952, aes(x = continent, y = gdpPercap)) +
+  geom_boxplot() +
+  scale_y_log10() + 
+  ggtitle("Comparing GDP per capita across continents")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
