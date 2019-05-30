@@ -1,3 +1,30 @@
+# For most human brains, it is quite difficult to extract this information just from looking at the numbers.
+# In contrast, the answer to all of these questions are readily available from examining this plot.
+# We are reminded of the saying,  "A picture is worth a thousand words."
+
+# Data visualization provides a powerful way to communicate a data driven finding.
+# In some cases, the visualization is so convincing that no follow up analysis is required.
+# The growing availability of informative data sets and software tools has lead to increased reliance on data visualization
+#across many industries, academia, and government.
+# A visible example are news organizations that are increasingly embracing data journalism and including effective 
+#info-graphics and charts as part of their reporting.
+
+# A particularly effective example is a Wall Street Journal article showing data related to the impact of vaccines
+#on battling infectious diseases.
+# One of the graphs shows measles cases by US state through the years with a vertical line demonstrating
+#when the vaccine was introduced.
+
+# Another striking example comes from the New York Times.
+# This article showed data on scores from the New York City regents exam.
+# These scores are collected for several reasons, including to determine if a student graduates from high school.
+# In New York City, you need a 65 to pass.
+# The distribution of the test scores forces us to notice something somewhat problematic.
+# The most common test score is the minimum passing grade.
+# With very few just below that value.
+# This unexpected result is consistent with students close to passing having their scores bumped up.
+# This is an example of how data visualization can lead to discoveries which would otherwise
+#be missed if we simply subject that data to a battery of data analysis, tools, or procedures.
+
 getwd()
 setwd("~/HARVARDx/02_Wrangling")
 #data wrangling
