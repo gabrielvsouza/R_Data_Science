@@ -1,0 +1,420 @@
+# How quickly can you determine which states have the largest populations?
+# Which states have the smallest?
+# How large is a typical state?
+# Is there a relationship between population size and total murders?
+# How do the murder rates vary across regions of the country?
+# For most human brains, it is quite difficult
+# to extract this information just from looking at the numbers.
+# the answer to all of these questions
+
+library(dslabs)
+murders
+
+#Ordering vectors
+# Store the murder rate per 100,000 for each state, in `murder_rate`
+murder_rate <- murders$total / murders$population * 100000
+# Store the `murder_rate < 1` in `low` 
+low <- murder_rate < 1
+low
+
+# Store the murder_rate < 1 in low 
+low <- murder_rate < 1
+# Get the indices of entries that are below 1
+ind <- which(low)
+ind
+# Names of states with murder rates lower than 1
+murders$state[low]
+
+# Create a vector ind for states in the Northeast and with murder rates lower than 1. 
+ind2 <- murders$region == "Northeast" & low
+# Names of states in `ind` 
+murders$state[ind2]
+
+#Filtering continued
+# Access the `state` variable and store it in an object
+states <- murders$state
+# Sort the object alphabetically and redefine the object
+states <- sort(states)
+# Report the first alphabetical value
+states[1]
+# Access population values from the dataset and store it in pop
+pop <- murders$population
+# Sort the object and save it in the same object
+pop <- sort(pop)
+# Report the smallest population size
+pop[1]
+
+#Filtering continued
+# Store the murder rate per 100,000 for each state, in murder_rate
+murder_rate <- murders$total/murders$population*100000
+murder_rate
+# Criando coluna rate
+#murders$rate <- c(murder_rate)
+#murders
+#states <- murders$state
+#ind <- order(murders$rate)
+# Criando um novo dataframe com state e rate
+#my_df <- data.frame(states = states[ind], murder_rate = murder_rate[ind])
+#my_df
+# Compute average murder rate and store in avg using `mean` 
+avg <- mean(murder_rate)
+avg
+# How many states have murder rates below avg ? Check using sum 
+below_avg <- sum(murder_rate <  avg)
+below_avg
+# States que estao below avg
+below <- murder_rate < avg
+murders$state[below]
+# New dataframe ordesd by rate - Criando um novo dataframe e ordenando por rate
+#newdata <- murders[order(murders$rate),]
+#newdata
+
+# Access population from the dataset and store it in pop
+pop <- murders$population
+# Use the command order, to order pop and store in object o
+o <- order(pop)
+# Find the index number of the entry with the smallest population size
+o[1]
+
+# Find the smallest value for variable total
+which.min(murders$total)
+# Find the smallest value for population
+which.min(murders$population)
+# Define the variable i to be the index of the smallest state
+i <- which.min(murders$population)
+i
+
+# Define variable states to hold the states
+states <- murders$state
+states
+# Use the index you just defined to find the state with the smallest population
+states[i]
+
+# Define a variable states to be the state names
+states <- murders$state
+# Define a variable ranks to determine the population size ranks
+ranks <- rank(murders$population)
+# Create a dataframe my_df with the state name and its rank
+my_df <- data.frame(state_name = states, rank = ranks)
+my_df
+
+# Define a variable states to be the state names from the murders data frame
+states <- murders$state
+# Define a variable ranks to determine the population size ranks
+ranks <- rank(murders$population)
+# Define a variable ind to store the indexes needed to order the population values
+ind <- order(murders$population)
+# Create a dataframe my_df with the state name and its rank and ordered from least populous to most
+my_df <- data.frame(states = states[ind], ranks = ranks[ind])
+my_df
+
+# Using new dataset is.na
+data(na_example)
+# Checking the structure 
+str(na_example)
+# Find out the mean of the entire dataset 
+mean(na_example)
+# Use is.na to create a logical index ind that tells which entries are NA
+ind <- is.na(na_example)
+# Determine how many NA ind has using the sum function
+sum(ind)
+# Note what we can do with the ! operator
+x <- c(1, 2, 3)
+ind <- c(FALSE, TRUE, FALSE)
+x[!ind]
+# Create the ind vector
+#library(dslabs)
+data(na_example)
+ind <- is.na(na_example)
+# We saw that this gives an NA
+mean(na_example)
+# Compute the average, for entries of na_example that are not NA
+mean(na_example[!ind])
+  
+
+#MATCH
+# Store the 3 abbreviations in abbs in a vector (remember that they are character vectors and need quotes)
+abbs <- c("AK", "MI", "IA")
+abbs
+# Match the abbs to the murders$abb and store in ind
+ind <- match(abbs, murders$abb)
+# Print state names from ind
+murders$state[ind]
+ 
+  
+# %in%
+# Store the 5 abbreviations in `abbs`. (remember that they are character vectors)
+abbs <- c("MA", "ME", "MI", "MO", "MU")
+abbs
+# Use the %in% command to check if the entries of abbs are abbreviations in the the murders data frame
+abbs %in% murders$abb
+
+
+#Data wrangling
+library(dplyr)
+
+# mutate
+# Redefine murders so that it includes column named rate with the per 100,000 murder rates
+murders <- mutate(murders, rate = total / population * 100000)
+head(murders)
+
+# Redefine murders to include a column named rank
+# with the ranks of rate from highest to lowest
+murders <- mutate(murders, rank = rank(-rate))
+head(murders)
+
+# select
+# Use select to only show state names and abbreviations from murders
+select(murders, state, abb)
+
+# filter
+# Add the necessary columns
+murders <- mutate(murders, rate = total/population * 100000, rank = rank(-rate))
+# Filter to show the top 5 states with the highest murder rates
+filter(murders, rank <= 5 )
+
+# filter with !=
+# Use filter to create a new data frame no_south
+no_south <- filter(murders, region != "South")
+no_south
+# Use nrow() to calculate the number of rows
+nrow(no_south)
+
+# filter with %in%
+# Create a new data frame called murders_nw with only the states from the northeast 
+#and the west
+murders_nw <- filter(murders, region %in%
+                       c("Northeast", "West"))
+murders_nw                     
+# Number of states (rows) in this category 
+nrow(murders_nw)
+
+# filtering by two conditions
+# add the rate column
+murders <- mutate(murders, rate =  total / population * 100000, rank = rank(-rate))
+# Create a table, call it my_states, that satisfies both the conditions 
+my_states <- filter(murders, rate < 1 &
+                      (region == "Northeast" | 
+                        region == "West"))
+my_states                    
+# Use select to show only the state name, the murder rate and the rank
+my_states %>% select(state, rate, rank)
+
+# Using the pipe %>%
+# show the result and only include the state, rate, and rank columns, all in one line
+filter(murders, region %in% 
+         c("Northeast", "West") & rate < 1) %>% 
+        select(state, rate, rank)
+
+
+# mutate, filter and select
+# Create new data frame called my_states (with specifications in the instructions)
+my_states <- murders %>%
+                mutate(rate =  total / population * 100000, rank = rank(-rate)) %>%
+                filter(region %in% 
+                c("Northeast", "West") & rate < 1) %>% 
+                select(state, rate, rank)
+my_states
+
+# Ordenando pelo menor rate
+murders2 <- mutate(murders, rate =  total / population * 100000, rank = rank(rate))
+murders2
+newdata <- murders2[order(murders2$rate),]
+newdata
+
+
+# Scatterplots
+# Load the datasets and define some variables
+data(murders)
+population_in_millions <- murders$population/10^6
+total_gun_murders <- murders$total
+plot(population_in_millions, total_gun_murders)
+# Transform population using the log10 transformation and save to object log10_population
+log10_population<- log10(murders$population)
+# Transform total gun murders using log10 transformation and save to object log10_total_gun_murders
+log10_total_gun_murders <- log10(murders$total)
+# Create a scatterplot with the log scale transformed population and murders 
+plot(log10_population, log10_total_gun_murders)
+
+# Histograms
+# Store the population in millions and save to population_in_millions 
+population_in_millions <- murders$population/10^6
+# Create a histogram of this variable
+hist(population_in_millions)
+
+# Boxplots
+# Create a boxplot of state populations by region for the murders dataset
+boxplot(population~region, data = murders)
+
+#Plot
+population_in_millions <- murders$population / 10^6
+total_gun_murders <- murders$total
+plot(population_in_millions, total_gun_murders)
+# Histogram 
+hist(murder_rate)
+murders$state[which.max(murders$rate)]
+# Boxplot
+boxplot(rate~region, data = murders)
+
+
+##### Basic Conditionals
+ind3 <- which.min(murder_rate)
+ind3
+murders$state[ind3]
+if (murder_rate[ind3] < 0.5) {
+  print(murders$state[ind3])
+} else {
+  print("No state has murder rate that low")
+}
+
+
+
+
+###### Assign the state abbreviation when the state name is longer than 8 characters 
+new_names <- ifelse(nchar(murders$state) > 8, murders$abb, murders$state)
+new_names
+
+
+
+
+####### na_example - replacing NA's with some other value ###########
+# ifelse(test_expression, x, y)
+na_example
+sum(is.na(na_example))
+#
+no_nas <- ifelse(is.na(na_example), 0, na_example)
+sum(is.na(no_nas))
+no_nas
+
+
+
+
+# any
+# takes a vector of logicals and return TRUE if any of the entries is TRUE
+z <- c(TRUE, TRUE, FALSE)
+any(z)
+
+# all
+# takes a vector of logicals and return TRUE if ALL of the entries is TRUE
+z <- c(TRUE, TRUE, FALSE)
+all(z)
+
+
+### Basic Functions
+avg <- function(x) {
+  s <- sum(x)
+  n <- length(x)
+  s/n
+}
+x <- 1:100
+avg(x)
+identical(mean(x), avg(x))
+# other way to define functions
+avg <- function(x, arithmetic = TRUE){
+  n <- length(x)
+  ifelse(arithmetic, sum(x)/n, prod(x)^(1/n))
+}
+# Create function called `sum_n`
+sum_n <- function(n){
+  s <- sum(1:n)
+  s
+}
+# Use the function to determine the sum of integers from 1 to 5000
+sum_n(5000)
+
+# Lexical scope
+x <- 8
+my_func <- function(y){
+  x <- 9
+  print(x)
+  y + x
+}
+my_func(x)
+print(x)
+
+
+# For Loops
+# formula that tell what the sum of 1 plus 2 plus 3... plus n
+# 1 + 2 + ... + n = n*(n+1)/2
+compute_s_n <- function(n){
+  x <- 1:n
+  sum(x)
+}
+compute_s_n(100)
+# simple for loop
+for (i in 1:5){
+  print(i)
+}
+# for loop with sum exemple
+m <- 25
+# create an empety vector
+s_n <- vector(length = m)
+for (n in 1:m){
+  s_n <- compute_s_n(n)
+}
+# checking
+n <- 1:m
+plot(n, s_n)
+# Here is an example of function that adds numbers from 1 to n
+example_func <- function(n){
+  x <- 1:n
+  sum(x)
+}
+# Here is the sum of the first 100 numbers
+example_func(100)
+# Write a function compute_s_n that with argument n and returns of 1 + 2^2 + ...+ n^2
+compute_s_n <- function(n){
+  x <- 1:n
+  sum(x^2)
+}
+# Report the value of the sum when n=10
+compute_s_n(10)
+
+
+
+
+############### write a for-loop to store the results in s_n ###########
+# Define a function and store it in `compute_s_n`
+compute_s_n <- function(n){
+  x <- 1:n
+  sum(x^2)
+}
+# Create a vector for storing results
+s_n <- vector("numeric", 25)
+# write a for-loop to store the results in s_n
+for (i in 1:25){
+  s_n[i] <- compute_s_n(i)
+}
+s_n
+
+
+# Define the function
+compute_s_n <- function(n){
+  x <- 1:n
+  sum(x^2)
+}
+# Define the vector of n
+n <- 1:25
+# Define the vector to store data
+s_n <- vector("numeric", 25)
+for(i in n){
+  s_n[i] <- compute_s_n(i)
+}
+#  Create the plot 
+plot(n, s_n)
+
+
+
+# apply sapply tapply mapply
+# apply family
+
+x <- c(TRUE)
+all(!x)
+
+
+
+
+
+
+
+
