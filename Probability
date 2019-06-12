@@ -1,0 +1,1609 @@
+#HarvardX: PH125.3x
+#Data Science: Probability
+
+#We start by covering some basic principles related to categorical data.
+#This subset of probability is referred to as discrete probability.
+#It will help us understand the probability theory
+#we will later introduce for numeric and continuous data, which is more
+#common in data science applications
+
+#If I have two red beads and three blue beads inside an urn
+#and I pick one at random, what is the probability of picking a red one?
+#Our intuition tells us that the answer is 2/5, or 40%.
+#A precise definition can be given by noting
+#that there are five possible outcomes of which two satisfy
+#the condition necessary for the event "pick a red bead."
+
+#Because each of the five outcomes has the same chance of occurring,
+#we conclude that the probability is 0.4 for red and 0.6 for blue.
+#A more tangible way to think about the probability of an event
+#is as a proportion of times the event occurs
+#when we repeat the experiment over and over independently and under the same
+#conditions.
+
+#Monte Carlo Simulations
+#Random number generators permit us to mimic the process of picking at random.
+#An example is the sample() function in R
+beads <- rep(c("red", "blue"), times = c(2,3))
+beads
+sample(beads, 1)
+#An example of Monte Carlo Simulation is that repeat the experiment a large enough number of times 
+#to make the results practically equivalent to doing it over and over forever. To perform our first
+#Monte Carlo simulation, we use the replicate() function, which permits us to repeat
+#the same task any number of times. Here, we repeat the random event B = 10,000 times
+B <- 100000
+events <- replicate(B, sample(beads, 1))
+
+#Use table to see the distribution:
+tab <- table(events)
+tab
+prop.table(tab)
+
+#The function sample has an argument that permits us to pick more than one element
+#from the urn. However, by default, this selection occurs without replacement.
+#Without Replacement:
+sample(beads, 5)
+sample(beads, 5)
+sample(beads, 5)
+#With Replacement:
+events <- sample(beads, B, replace = TRUE)
+prop.table(table(events))
+
+
+#Probability Distributions
+#If you’re are randomly calling likely voters from a population that has 44% Democrat,
+#44% Republican, 10% undecided, and 2% green, these proportions define the probability 
+#for each group. For this example, the probability distribution is simply these four
+#proportions.
+
+#Independence
+#Every time we toss a fair coin, the probability of seeing heads is 1/2 regardless of 
+#what previous tosses have revealed.
+
+#Non-Independent Events
+#The first outcome affects the second. If we deal a King for the first card, and don’t 
+#replace it into the deck, the probabilities of a second card being a King is less 
+#because there are only three Kings left: the probability is 3 out of 51. 
+#To see an extreme case of non-independent events, consider our example of drawing five
+#beads at random without replacement:
+x <- sample(beads, 5)
+#If you have to guess the color of the first bead, you will predict blue since blue has
+#a 60% chance. But if I show you the result of the last four outcomes:
+x[2:5]
+#> [1] "blue" "blue" "blue" "red"
+#would you still guess blue? Of course not. Now you know that the probability of red is
+#1 since the only bead left is red. 
+#The events are not independent, so the probabilities change.
+
+#Conditional probabilities
+#When events are not independent, conditional probabilities are useful. We already saw 
+#an example of a conditional probability: we computed the probability that a second 
+#dealt card is a King given that the first was a King. In probability, we use the 
+#following notation
+Pr(Card 2 is a king∣Card 1 is a king) = 3/51
+#We use the ∣ as shorthand for “given that” or “conditional on”.
+#When two events, say A and B , are independent, we have:
+Pr(A∣B) = Pr(A)
+
+## Multiplication rule 
+#If we want to know the probability of two events, say A and B, occurring, 
+#we can use the multiplication rule:
+Pr(A and B)=Pr(A)Pr(B∣A)
+#Let’s use Blackjack as an example. In Blackjack, you are assigned two random cards. 
+#After you see what you have, you can ask for more. The goal is to get closer to 21 
+#than the dealer, without going over. Face cards are worth 10 points and Aces are 
+#worth 11 or 1 (you choose).
+#So, in a Blackjack game, to calculate the chances of getting a 21 by drawing an Ace 
+#and then a face card, we compute the probability of the first being an Ace and 
+#multiply by the probability of drawing a face card given that the first was an Ace:  
+1/13×12/52≈0.02
+# This is approximately 2%.
+#The multiplicative rule also applies to more than two events. We can use induction to 
+#expand for more events:
+Pr(A and B and C) = Pr(A)Pr(B∣A)Pr(C∣A and B)
+
+##Multiplication rule under indepedence
+#When we have independent events, then the multiplication rule becomes simpler:
+Pr(A and B and C)=Pr(A)Pr(B)Pr(C)
+#But we have to be very careful before using this since assuming independence can 
+#result in very different and incorrect probability calculations when we don’t actually have independence.
+#As an example, imagine a court case in which the suspect was described as having a mustache and a beard. 
+The defendant has a mustache and a beard and the prosecution brings in an “expert” to testify that 1/10 men have 
+beards and 1/5 have mustaches, so using the multiplication rule we conclude that only  
+1/10×1/5
+#or 0.02 have both.
+#But to multiply like this we need to assume independence! Say the conditional 
+#probability of a man having a mustache conditional on him having a beard is .95. 
+#So the correct calculation probability is much higher:  
+1/10×95/100=0.095
+#The 9% came from multiplying a 10% chance of having a beard by a 95% chance of someone with a beard also having a mustache
+#The multiplication rule also gives us a general formula for computing conditional 
+#probabilities:
+https://rafalab.github.io/dsbook/probability.html#independence
+
+#Assessment: Introduction to Discrete Probability
+#Probability of cyan
+#One ball will be drawn at random from a box containing: 3 cyan balls, 5 magenta balls, and 7 yellow balls.
+#What is the probability that the ball will be cyan?
+cyan <- 3
+magenta <- 5
+yellow <- 7
+balls <- cyan + magenta + yellow
+p_cyan <-  cyan / balls
+p_cyan  
+  
+#Probability of not cyan  
+#One ball will be drawn at random from a box containing: 3 cyan balls, 5 magenta balls, and 7 yellow balls.
+#What is the probability that the ball will not be cyan?  
+p_not_cyan <- 1- p_cyan
+p_not_cyan 
+  
+#Sampling without replacement  
+#Instead of taking just one draw, consider taking two draws. You take the second draw without returning the first draw 
+to the box. We call this sampling without replacement.
+#What is the probability that the first draw is cyan and that the second draw is not cyan?
+without <- 3/15 * (1-2/14) 
+without  
+  
+#Sampling with replacement
+#Now repeat the experiment, but this time, after taking the first draw and recording the color, return it back to the 
+box and shake the box. We call this sampling with replacement.
+#What is the probability that the first draw is cyan and that the second draw is not cyan?
+with <- 3/15 * (1-3/15) 
+with
+#Instead of taking just one draw, consider taking two draws. You take the second draw without returning the first draw 
+to the box. We call this sampling without replacement.
+#What is the probability that the first draw is cyan and that the second draw is not cyan?
+#Calculate the conditional probability p_2 of choosing a ball that is not cyan after one cyan ball has been removed from
+the box.
+#Calculate the joint probability of both choosing a cyan ball on the first draw and a ball that is not cyan on the second 
+draw using p_1 and p_2
+cyan <- 3
+magenta <- 5
+yellow <- 7
+# The variable `p_1` is the probability of choosing a cyan ball from the box on the first draw.
+p_1 <- cyan / (cyan + magenta + yellow)
+# Assign a variable `p_2` as the probability of not choosing a cyan ball on the second draw without replacement.
+p_2 <- 1 - (cyan - 1) / (cyan + magenta + yellow - 1)
+# Calculate the probability that the first draw is cyan and the second draw is not cyan.
+p_1 * p_2
+
+
+###Combinations and Permutations
+
+#Lets start by creating a deck of card using R by using the two functions: 
+expand.grid() and paste()
+paste(letters[1:5], as.character(1:5))
+expand.grid(pants = c("blue", "black"), shirt = c("white", "grey", "plaid"))
+# how to generate a deck of cards
+suits <- c("Diamonds", "Clubs", "Hearts","Spades")
+numbers <- c("Ace", "Deuce",  "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+             "Jack", "Queen", "King" )
+deck <- expand.grid(number=numbers, suit=suits)
+deck <- paste(deck$number, deck$suit)
+
+#Did we construct the right deck: what is the probability of a king in the first deck (1 in 13)?
+king <- paste("King", suits)
+mean(deck %in% king)
+sum(deck %in% king)
+
+#What is the chance of drawing two kings in a row: (4/52) * (3/51), for this we can 
+#use the combination() and permutation() functions) Permutations: computes, for any 
+#list of size n, all the different ways we can select r items
+# here all the ways we can choose 2 numbers from the list 1, 2, 3, 4, 5. Notice that the order matters.
+#So 3, 1 is different than 1, 3, So it appears in our permutations.
+library(gtools)
+permutations(5,2)
+# the reason for 1,1 2,2 .. not in the list is once we picked a number we can't pick it again
+all_phone_numbers <- permutations(10, 7, v=0:9)
+n <- nrow(all_phone_numbers)
+index <- sample(n, 5)
+all_phone_numbers[index,]
+
+#To do this fopr card selection
+hands <- permutations(52, 2, v = deck)
+52 * 51
+
+#check how many have the first card as a king
+firstCard <- hands[,1]
+secondCard<-hands[,2]
+sum(firstCard %in% king)
+
+#How man cases have both a king in first card and in second card
+sum(firstCard %in% king & secondCard %in% king) / sum(firstCard %in% king)
+3/51
+The difference between pemutations (orders matter) and combinations where orders doesn’t matter
+permutations(3,2)
+combinations(3,2)
+#So to compute the probability of a natural 21 in blackjack, we can do this. We can 
+#define a vector that includes all the aces, a vector that includes all the face cards,
+#then we generate all the combinations of picking 2 cards out of 52, and then we simply
+#count. How often do we get aces and a face card?
+aces <- paste("Ace", suits)
+aces
+facecard <- c("King", "Queen", "Jack", "Ten")
+facecard <- expand.grid(number=facecard, suit=suits)
+#facecard
+facecard <- paste(facecard$number, facecard$suit)
+#facecard
+#Generate all hands for a deck:
+hands <- combinations(52, 2, v=deck)
+mean(hands[,1] %in% aces & hands[,2] %in% facecard)
+#The below code takes into account that ace and picture can be first or last
+mean((hands[,1] %in% aces & hands[,2] %in% facecard) |
+       (hands[,2] %in% aces & hands[,1] %in% facecard))
+#use hand to draw samples of two cards
+hand <- sample(deck, 2)
+hand
+#Doing a monte Carlo Simulation to check
+B <- 10000
+results <- replicate(B, {
+  hand <- sample(deck,2)
+  ((hands[,1] %in% aces & hands[,2] %in% facecard) |
+      (hands[,2] %in% aces & hands[,1] %in% facecard))
+})
+mean(results)
+
+
+###The Birthday problem
+#In a class with 50 students, what is the probability that two have birthsday the same day 
+#(29 feb is excluded)
+n <- 50
+bdays <- sample(1:365, n, replace=TRUE)
+# to check we can use duplicated
+duplicated(c(1,2,3,1,4,3,5))
+#So to check for the birthsdays
+any(duplicated(bdays))
+#to estimate the probability, we're going to repeat this experiment.
+#We're going to run a Monte Carlo simulation over and over again.
+#So what we do is we do it 10,000 times.
+B <- 10000
+results <- replicate(B,{
+  bdays <- sample(1:365, n, replace = TRUE)
+  any(duplicated(bdays))
+})
+mean(results)
+
+##sapply
+#Say you want to use what you've just
+#learned about the birthday problem to bet
+#with friends about two people having the same birthday in a group of people.
+#When are the chances larger than 50%?
+#Larger than 75%?
+#We'll call it compute prob, and we'll basically
+#make the calculations for the probability
+#of two people having the same birthday.
+#We will use a small Monte Carlo simulation to do i
+compute_prob <- function(n, B=10000) {
+  same_day <- replicate(B,{
+    bdays <- sample(1:365, n, replace = TRUE)
+    any(duplicated(bdays))
+  })
+  mean(same_day)
+}
+n <- seq(1,60)
+#the probability of two people having the same birthday for that n.
+prob <- sapply(n, compute_prob)
+plot(n,prob)
+#To make the math simpler for this particular problem,
+#instead of computing the probability of it happening,
+#we'll compute the probability of it not happening,
+#and then we can use the multiplication rule.
+P(person 1 has a unique birthday) = 1 
+P(peson 2 has a unique birthday | person 1 has a unique birthday) = 364/365 
+P(peson 3 has a unique birthday | person 1 and 2 has a unique birthday) = 363/365
+#
+exact_prob <- function(n){
+  prob_unique <- seq(365, 365-n+1) / 365
+  1-prob_unique
+}
+eprob <- sapply(n, exact_prob)
+eprob <- as.numeric(unlist(eprob))
+class(eprob)
+class(prob)
+dim(eprob)
+plot(eprob)
+plot(prob)
+#eprob
+#prob
+#lines(n, eprob, col="red")
+
+
+##How many Monte Carlo experiments are enough?
+#We yse the birthday experiment with different MC sizes
+#One practical approach we will describe here
+#is to check for the stability of the estimate.
+#Here's an example with the birthday problem.
+B <- 10^seq(1,5, len = 100)
+compute_prob <- function(B, n=22){
+  same_day <- replicate(B, {
+    bdays <- sample(1:365, n, replace=TRUE)
+    any(duplicated(bdays))
+  })
+  mean(same_day)
+}
+prob <- sapply(B, compute_prob)
+#We compute the simulation, and now we look at the values
+#that we get for each simulation.
+#Remember, each simulation has a different b,
+#a different number of experiments.
+#When we see this graph, we can see that it's wiggling up and down.
+#That's because the estimate is not stable yet.
+plot(B, prob)
+
+Exercise 1. Independence
+Imagine you draw two balls from a box containing colored balls. You either replace the first ball before you draw the 
+second or you leave the first ball out of the box when you draw the second ball.
+Under which situation are the two draws independent of one another?
+Remember that two events A and B are independent if Pr(A and B)=Pr(A)P(B).
+Answer: You do replace the first ball before drawing the next.
+
+Exercise 2. Sampling with replacement
+Say you’ve drawn 5 balls from the a box that has 3 cyan balls, 
+5 magenta balls, and 7 yellow balls, with replacement, and all have been yellow.
+What is the probability that the next one is yellow?
+cyan <- 3
+magenta <- 5
+yellow <- 7
+# Assign the variable 'p_yellow' as the probability that a yellow ball is drawn from the box.
+p_yellow <- yellow/(cyan+magenta+yellow)
+# Using the variable 'p_yellow', calculate the probability of drawing a yellow ball on the sixth draw. 
+Print this value to the console.
+p_yellow
+  
+#Exercise 3. Rolling a die
+If you roll a 6-sided die once, what is the probability of not seeing a 6? 
+If you roll a 6-sided die six times, what is the probability of not seeing a 6 on any roll?  
+# Assign the variable 'p_no6' as the probability of not seeing a 6 on a single roll.
+p_no6 <- 5/6
+# Calculate the probability of not seeing a 6 on six rolls.
+p_no6^6
+  
+#Exercise 4. Probability the Celtics win a game
+#Two teams, say the Celtics and the Cavs, are playing a seven game series. 
+#The Cavs are a better team and have a 60% chance of winning each game.
+#What is the probability that the Celtics win at least one game? Remember 
+#that the Celtics must win one of the first four games, or the series will be over!
+# Assign the variable `p_cavs_win4` as the probability that the Cavs will 
+#win the first four games of the series.
+p_cavs_win4 <- 0.6^4
+# Using the variable `p_cavs_win4`, calculate the probability that the Celtics win
+#at least one game in the first four games of the series.
+(1-p_cavs_win4)
+  
+
+#Exercise 5. Monte Carlo simulation for Celtics winning a game
+#Create a Monte Carlo simulation to confirm your answer to the previous problem by 
+#estimating how frequently the Celtics win at least 1 of 4 games. Use B <- 10000 simulations.
+#The provided sample code simulates a single series of four random games, 
+#simulated_games.
+#
+# This line of sample code simulates four random games where the Celtics either lose or win. 
+Each game is independent of other games.
+simulated_games <- sample(c("lose","win"), 4, replace = TRUE, prob = c(0.6, 0.4))
+# The variable 'B' specifies the number of times we want the simulation to run. 
+Let's run the Monte Carlo simulation 10,000 times.
+B <- 10000
+# Use the `set.seed` function to make sure your answer matches the expected result after random sampling.
+set.seed(1)
+# Create an object called `celtic_wins` that first replicates the sample code generating the variable
+called `simulated_games` for `B` iterations and then tallies the number of simulated series that contain at 
+least one win for the Celtics.
+celtic_wins <- replicate(B, {
+  simulated_games <- sample(c("lose","win"), 4, replace = TRUE, prob = c(0.6, 0.4))
+  any(simulated_games=="win")
+})
+# Calculate the frequency out of B iterations that the Celtics won at least one game. Print your answer to the console. 
+mean(celtic_wins)
+
+
+#The Addition Rule
+p(A or B) = p(A) + p(B) – p(A and B)
+Example question: What is the probability that a card chosen from a standard deck will be a Jack or a heart? 
+p(Jack) = 4/52
+p(Heart) = 13/52
+p(Jack of Hearts) = 1/52
+So:
+p(Jack or Heart) = p(Jack) + p(Heart) – p(Jack of Hearts) = 
+  4/52 + 13/52 – 1/52 = 16/52.  
+
+The addition rule tells us the probability of A or B is the probability of A plus the probability a B minus 
+the probability of A and B.
+The probability of an ace followed by a face card we know: Ace, followed by facecard: 1/13 * 16/51 Facecard 
+followed by ace: 16/52 * 4/51
+p1 <- 1/13 * 16/51
+p2 <- 16/52 * 4/51
+p <- p1 + p2
+p
+
+
+#The Monty Hall problem
+https://rafalab.github.io/dsbook/probability.html#monty-hall-problem
+The Monte Carlo simulation code to estimate the probabilities for the Monty Hall 
+stick strategy code
+B <- 10000
+stick <- replicate(B, {
+  doors <- as.character(1:3)
+  prize <- sample(c("car","goat","goat"))
+  prize_door <- doors[prize == "car"]
+  my_pick  <- sample(doors, 1)
+  show <- sample(doors[!doors %in% c(my_pick, prize_door)],1)
+  stick <- my_pick
+  stick == prize_door
+})
+mean(stick)
+
+#The same experiment but now we use the switch strategy (always switching)
+switch <- replicate(B, {
+  doors <- as.character(1:3)
+  prize <- sample(c("car","goat","goat"))
+  prize_door <- doors[prize == "car"]
+  my_pick  <- sample(doors, 1)
+  show <- sample(doors[!doors %in% c(my_pick, prize_door)], 1)
+  stick <- my_pick
+  switch <- doors[!doors%in%c(my_pick, show)]
+  switch == prize_door
+})
+mean(switch)
+
+#Exercise 1. The Cavs and the Warriors
+#Two teams, say the Cavs and the Warriors, are playing a seven game championship 
+#series. The first to win four games wins the series. The teams are equally good, 
+#so they each have a 50-50 chance of winning each game.
+#If the Cavs lose the first game, what is the probability that they win the series?
+# Assign a variable 'n' as the number of remaining games.
+n <- 6
+# Assign a variable 'l' to a list of possible game outcomes, where 0 indicates a loss 
+#and 1 indicates a win for the Cavs. 
+l <- list(0:1)
+# Create a data frame named 'possibilities' that contains all possible outcomes for 
+#the remaining games.
+possibilities <- expand.grid(rep(l, n))
+# Create a vector named 'results' that indicates whether each row in the data frame 'possibilities' contains
+enough wins for the Cavs to win the series.
+results <- rowSums(possibilities)>=4
+# Calculate the proportion of 'results' in which the Cavs win the series. Print the outcome to the console.
+mean(results)
+
+#Exercise 2. The Cavs and the Warriors - Monte Carlo
+#Confirm the results of the previous question with a Monte Carlo simulation to estimate
+#the probability of the Cavs winning the series after losing the first game.
+# The variable `B` specifies the number of times we want the simulation to run. 
+#Let's run the Monte Carlo simulation 10,000 times.
+B <- 10000
+# Use the `set.seed` function to make sure your answer matches the expected result 
+#after random sampling.
+set.seed(1)
+# Create an object called `results` that replicates the sample code for `B` iterations
+#and tallies the number of simulated series that contain at least four wins for the Cavs.
+results <- replicate(B, {
+  cavs_wins <- sample(c(0,1), 6, replace = TRUE)
+  sum(cavs_wins)>=4
+})
+# Calculate the frequency out of `B` iterations that the Cavs won at least four games
+#in the remainder of the series. Print your answer to the console.
+mean(results)
+
+#Exercise 3. A and B play a series - part 1
+#Two teams, A and B, are playing a seven series game series. Team A is better than 
+#team B and has a p>0.5 chance of winning each game.
+#Use the function sapply to compute the probability, call it Pr of winning for p <- seq(0.5, 0.95, 0.025)
+# Let's assign the variable 'p' as the vector of probabilities that team A will win.
+p <- seq(0.5, 0.95, 0.025)
+# Given a value 'p', the probability of winning the series for the underdog team B can be computed with the following 
+function based on a Monte Carlo simulation:
+prob_win <- function(p){
+  B <- 10000
+  result <- replicate(B, {
+    b_win <- sample(c(1,0), 7, replace = TRUE, prob = c(1-p, p))
+    sum(b_win)>=4
+  })
+  mean(result)
+}
+# Apply the 'prob_win' function across the vector of probabilities that team A will win to determine the probability 
+that team B will win. Call this object 'Pr'.
+Pr <- sapply(p, prob_win)
+#Then plot the result plot(p, Pr).
+# Plot the probability 'p' on the x-axis and 'Pr' on the y-axis.
+plot(p, Pr)
+
+#Exercise 4. A and B play a series - part 2
+#Repeat the previous exercise, but now keep the probability that team A wins fixed 
+#at p <- 0.75 and compute the probability for different series lengths. 
+#For example, wins in best of 1 game, 3 games, 5 games, and so on through a series that lasts 25 games.
+# Given a value 'p', the probability of winning the series for the underdog team $B$ can be computed with the following
+function based on a Monte Carlo simulation:
+prob_win <- function(N, p=0.75){
+  B <- 10000
+  result <- replicate(B, {
+    b_win <- sample(c(1,0), N, replace = TRUE, prob = c(1-p, p))
+    sum(b_win)>=(N+1)/2
+  })
+  mean(result)
+}
+# Assign the variable 'N' as the vector of series lengths. Use only odd numbers ranging from 1 to 25 games.
+N <- seq(1, 25, 2)
+# Apply the 'prob_win' function across the vector of series lengths to determine the probability that team B will win. 
+Call this object `Pr`.
+Pr<- sapply(N, prob_win)
+# Plot the number of games in the series 'N' on the x-axis and 'Pr' on the y-axis.
+plot(N, Pr)
+
+
+### Continuous probability
+
+understand the differences between calculating probabilities for discrete and continuous data.
+be able to use cumulative distribution functions to assign probabilities to intervals when dealing with continuous data.
+be able to use R to generate normally distributed outcomes for use in Monte Carlo simulations.
+know some of the useful theoretical continuous distributions in addition to the normal distribution, such as 
+the student-t, chi-squared, exponential, gamma, beta, and beta-binomial distributions.
+
+library(tidyverse)
+library(dslabs)
+data(heights)
+x <- heights %>% filter(sex=="Male") %>% .$height
+
+# now we can define the imperical distribution function
+F <- function(a) mean(x<=a)
+
+Keep in mind that we have not yet introduced probability. Let’s do this by asking the following: 
+if I pick one of the male students at random, what is the chance that he is taller than 70.5 inches? 
+Because every student has the same chance of being picked, the answer to this is equivalent to the proportion of 
+students that are taller than 70.5 inches. Using the CDF we obtain an answer by typing
+1 -F(70.5)
+
+
+#Theoretical Distribution
+The cumulative distribution for the normal distribution is defined by a mathematical formula, which in R can be obtained
+with the function pnorm. Using the normal distribution:
+  F(a) = rnorm(a, m, s) 
+
+#Theoretical distributions as approximations
+The normal distribution is derived mathematically: we do not need data to define it. For practicing data scientists, 
+almost everything we do involves data. Data is always, technically speaking, discrete. 
+For example, we could consider our height data categorical with each specific height a unique category. 
+The probability distribution is defined by the proportion of students reporting each height
+1 - pnorm(70.5, mean(x), sd(x))
+
+# This is the actual data:
+mean(x <= 68.5) - mean(x <= 67.5)
+mean(x <= 69.5) - mean(x <= 68.5)
+mean(x <= 70.5) - mean(x <= 69.5)
+
+# and this is the approximation:
+pnorm(68.5, mean(x), sd(x)) - pnorm(67.5, mean(x), sd(x))
+pnorm(69.5, mean(x), sd(x)) - pnorm(68.5, mean(x), sd(x))
+pnorm(70.5, mean(x), sd(x)) - pnorm(69.5, mean(x), sd(x))
+
+#Probability Density
+The probability density at x is defined as the function, we’re going to call it little f of x, such that the 
+probability distribution big F of a, which is the probability of x being less than or equal to a, is the
+integral of all values up to a of little f of x dx.
+
+dnorm() is the probability density function for the normal distribution
+# the probability that a person is higher than 76 inch
+avg <- mean(x)
+s <- sd(x)
+1 - pnorm(76, avg, s)
+
+Although it may not be immediately obvious
+why knowing about probability densities is useful, understanding this concept
+will be essential to those wanting to fit models
+to data for which predefined functions are not available
+dnorm(76, mean(x), sd(x))
+
+
+#Monte Carlo Simulations
+#Monte Carlo simulations using normally distributed variables.
+
+#R provides a function to generate normally distributed outcomes.
+Specifically, the rnorm function takes three arguments-- size; average,
+which defaults to 0; standard deviation, which defaults to 1--
+and produces these random numbers.
+Here's an example of how we can generate data
+that looks like our reported heights.
+So if our reported heights are in the vector x, we compute their
+length, their average, and their standard deviation, and then
+use the rnorm function to generate the randomly distributed outcomes.
+Not surprisingly, the distribution of these outcomes
+looks normal because they were generated to look normal.
+This is one of the most useful functions in R,
+as it will permit us to generate data that mimics naturally occurring events,
+and it'll let us answer questions related
+to what could happen by chance by running Monte Carlo simulations.
+
+x <- heights %>% filter(sex=="Male") %>% .$height
+n <- length(x)
+avg <- mean(x)
+s <- sd(x)
+simulated_heights <- rnorm(n, avg, s)
+
+ds_theme_set()
+data.frame(simulated_heights=simulated_heights) %>% ggplot(aes(simulated_heights)) +
+  geom_histogram(cloor="black", binwidth = 2)
+## Warning: Ignoring unknown parameters: cloor
+
+#For example, if we pick 800 males at random,
+what is the distribution of the tallest person?
+Specifically, we could ask, how rare is that the tallest person is a seven
+footer?
+We can use the following Monte Carlo simulation to answer this question.
+We're going to run 10,000 simulations, and for each one,
+we're going to generate 800 normally distributed values,
+pick the tallest one, and return that.
+The tallest variable will have these values.
+So now we can ask, what proportion of these simulations
+return a seven footer as the tallest person?
+#And we can see that it's a very small number
+
+B <- 10000
+tallest <- replicate(B, {
+  simulated_data <- rnorm(800, avg, s)
+  max(simulated_data)
+})
+mean(tallest)
+
+mean(tallest >= 7*12)
+
+#Other Continuous Distributions
+Other continuous distributions: 
+  student-t 
+  chi-sqyuared 
+  gamma 
+  beta
+R provides functions to compute the density, the quantiles,
+the cumulative distribution function, and to generate
+Monte Carlo simulations for all these distributions
+
+R uses a convention that lets us remember the names of these functions. 
+Namely, using the letters: 
+  * d for density, 
+  * qfor quantile, 
+  * p for probability density function, 
+  * r for random. 
+By putting these letters in front of a shorthand for the distribution,
+
+#Example: we can use the dnorm function to generate this plot. 
+#This is the density function for the normal distribution.
+x <- seq(-4, 4, length.out = 100)
+data.frame(x, f = dnorm(x)) %>% ggplot(aes(x,f)) +
+  geom_line()
+
+#This is the density function for the normal distribution.
+#We use the function dnorm.
+#For the student's t distribution, which has shorthand t,
+#we can use the functions dt, qt, pt, and rt
+#to generate the density, quantiles, probability density
+#function, or a Monte Carlo simulation
+
+Exercise 1. Distribution of female heights - 1
+Assume the distribution of female heights is approximated by a normal distribution with a mean of 64 inches and
+a standard deviation of 3 inches. If we pick a female at random, what is the probability that she is 5 feet or shorter?
+# Assign a variable 'female_avg' as the average female height.
+female_avg <- 64
+# Assign a variable 'female_sd' as the standard deviation for female heights.
+female_sd <- 3
+# Using variables 'female_avg' and 'female_sd', calculate the probability that a randomly selected female is 
+shorter than 5 feet. Print this value to the console.
+pnorm(5*12, female_avg,female_sd)
+
+
+Exercise 2. Distribution of female heights - 2
+Assume the distribution of female heights is approximated by a normal distribution with a mean of 64 inches and 
+a standard deviation of 3 inches. If we pick a female at random, what is the probability that she is 6 feet or taller?
+# Assign a variable 'female_avg' as the average female height.
+female_avg <- 64
+# Assign a variable 'female_sd' as the standard deviation for female heights.
+female_sd <- 3
+# Using variables 'female_avg' and 'female_sd', calculate the probability that a randomly selected female is 6 
+feet or taller. Print this value to the console.
+1-pnorm(6*12, female_avg,female_sd)
+
+
+Exercise 3. Distribution of female heights - 3
+Assume the distribution of female heights is approximated by a normal distribution with a mean of 64 inches and a
+standard deviation of 3 inches. If we pick a female at random, what is the probability that she is between 61 and 67 inches?
+# Assign a variable 'female_avg' as the average female height.
+female_avg <- 64
+# Assign a variable 'female_sd' as the standard deviation for female heights.
+female_sd <- 3
+# Using variables 'female_avg' and 'female_sd', calculate the probability that a randomly selected female is
+between the desired height range. Print this value to the console.
+pnorm(67, female_avg,female_sd) - pnorm(61, female_avg,female_sd)
+
+Exercise 4. Distribution of female heights - 4
+Repeat the previous exercise, but convert everything to centimeters. That is, multiply every height, including 
+the standard deviation, by 2.54. What is the answer now?
+# Assign a variable 'female_avg' as the average female height. Convert this value to centimeters.
+female_avg <- 64*2.54
+# Assign a variable 'female_sd' as the standard deviation for female heights. Convert this value to centimeters.
+female_sd <- 3*2.54
+# Using variables 'female_avg' and 'female_sd', calculate the probability that a randomly selected female is
+between the desired height range. Print this value to the console.
+pnorm(67*2.54, female_avg,female_sd) - pnorm(61*2.54, female_avg,female_sd)  
+#Notice that the answer to the question does not change when you change units. This makes sense because the 
+answer to the question should not be affected by which units we use. In fact, if you look closely, you notice that
+61 and 67 are both 1 SD away from the average  
+
+Exercise 5. Probability of 1 SD from average
+Compute the probability that the height of a randomly chosen female is within 1 SD from the average height.
+# Assign a variable 'female_avg' as the average female height.
+female_avg <- 64
+# Assign a variable 'female_sd' as the standard deviation for female heights.
+female_sd <- 3
+# To a variable named 'taller', assign the value of a height that is one SD taller than average.
+taller <- female_avg + female_sd
+# To a variable named 'shorter', assign the value of a height that is one SD shorter than average.
+shorter <- female_avg - female_sd
+# Calculate the probability that a randomly selected female is between the desired height range. 
+Print this value to the console.
+pnorm(taller, female_avg,female_sd) - pnorm(shorter, female_avg,female_sd)
+
+
+Exercise 6. Distribution of male heights
+Imagine the distribution of male adults is approximately normal with an expected value of 69 inches and a 
+standard deviation of 3 inches. How tall is a male in the 99th percentile?
+# Assign a variable 'female_avg' as the average female height.
+male_avg <- 69
+# Assign a variable 'female_sd' as the standard deviation for female heights.
+male_sd <- 3
+# Determine the height of a man in the 99th percentile of the distribution.
+qnorm(0.99, male_avg, male_sd)
+
+
+Exercise 7. Distribution of IQ scores
+The distribution of IQ scores is approximately normally distributed. The expected value is 100 and the standard 
+deviation is 15. Suppose you want to know the distribution of the person with the highest IQ in your school district, 
+where 10,000 people are born each year.
+Generate 10,000 IQ scores 1,000 times using a Monte Carlo simulation. Make a histogram of the highest IQ scores.
+# The variable `B` specifies the number of times we want the simulation to run.
+B <- 1000
+# Use the `set.seed` function to make sure your answer matches the expected result after random number generation.
+set.seed(1)
+# Create an object called `highestIQ` that contains the highest IQ score from each random distribution of 10,000 people.
+highestIQ <- replicate(B, {
+  sim <- rnorm(10000,100,15)
+  max(sim)
+})
+# Make a histogram of the highest IQ scores.
+hist(highestIQ)
+
+
+
+### Random Variables, Sampling Models, and the Central Limit Theorem
+Section 3 is divided into two parts:
+  
+Random Variables and Sampling Models
+The Central Limit Theorem.
+
+understand what random variables are, how to generate them, and the correct mathematical notation to use with them.
+be able to use sampling models to estimate characteristics of a larger population.
+be able to explain the difference between a distribution and a probability distribution.
+understand the Central Limit Theorem and the law of large numbers
+
+###Random Variables and Sampling Models
+#Random Variables
+Random variables are numeric outcomes resulting from a random process.
+Below is the beads example where we use a random generator
+beads <- rep(c("red", "blue"), times = c(2,3))
+X <- ifelse (sample(beads, 1) == "blue", 1, 0)
+X
+
+In data science, we often deal with data that is affected by chance in some way.
+The data comes from a random sample, the data is affected by measurement error,
+or the data measures some outcome that is random in nature.
+Being able to quantify the uncertainty introduced by randomness
+is one of the most important jobs of a data scientist.
+
+Statistical inference offers a framework for doing this, as well
+as several practical tools.
+The first step is to learn how to mathematically describe
+random variables.
+
+
+
+###Sampling Models
+For example, we can model the process of polling likely voters as drawing 0’s– Republicans– and 1’s– Democrats– from 
+an urn containing the 0 and 1 code for all likely voters.
+In epidemiological studies, we often assume that the subjects in our study are a random sample from the population of 
+interest. The data related to a specific outcome can be modeled as a random sample
+Similarly, in experimental research, we often assume that the individual organisms we are studying– for example, worms, 
+flies, or mice– are a random sample from a larger population.
+Casino games offer a plethora of examples of real-world situations in which sampling models are used to answer specific 
+questions.
+Roulette wheel example
+The data related to a specific outcome can be modeled as a random sample
+from an urn containing the values for those outcomes
+for the entire population of interest.
+
+Similarly, in experimental research, we often assume that the individual
+organisms we are studying-- for example, worms, flies, or mice--
+are a random sample from a larger population.
+Randomized experiments can also be modeled by draws from urn,
+given the way individuals are assigned to groups.
+When getting assigned, you draw your group at random.
+Sampling models are therefore ubiquitous in data science.
+https://rafalab.github.io/dsbook/random-variables.html
+
+A very important and useful concept is the probability distribution
+of the random variable.
+The probability distribution of a random variable
+tells us the probability of the observed value falling in any given interval.
+
+color <- rep(c("Black", "Red", "Green"), c(18,18,2))
+
+n <- 1000
+X <- sample(ifelse(color =="Red", -1, 1), n, replace = TRUE)
+X[1:10]
+
+X <- sample(c(-1,1), n, replace = TRUE, prob=c(9/19, 10/19))
+S <- sum(X)
+S
+
+Running a Monte Carlo Simulation with the above example
+a <- 0
+n <- 1000
+B <- 10000
+roulette_winnings <- function(n){
+  X <- sample(c(-1,1), n, replace = TRUE, prob=c(9/19, 10/19))
+  sum(X)
+}
+S <- replicate(B, roulette_winnings(n))
+
+mean(S <= a)
+
+In fact, we can visualize the distribution
+by creating a histogram showing the probability
+f(b) minus f(a) for several intervals ab.
+
+#Now we can easily answer the casino's question,
+#how likely is it that we lose money?
+#We simply ask, how often was S, out of the 10,000 simulations, smaller than 0?
+#And the answer is, it was only 4.6% of the time.
+mean(S<0)
+#So it's quite low
+
+
+mean(S)
+sd(S)
+
+s <- seq(min(S), max(S), length = 100)
+normal_density <- data.frame(S = s, f=dnorm(s, mean(S), sd(S)))
+data.frame(S=S) %>% ggplot(aes(S, ..density..)) +
+  geom_histogram(color = "black", binwidth = 10) +
+  ylab("Probability") +
+  geom_line(data = normal_density, mapping=aes(s,f), color="blue")
+
+#Because we have the original values from which the distribution is created,
+#we can easily compute these.
+#The average is 52.5, and the standard deviation is 31.75.
+#If we add a normal density with this average and standard deviation
+#to the histogram we created earlier, we see that it matches very well.
+
+
+
+###Distributions versus Probability Distributions
+Previously we described how any list of numbers, let’s call it x1 through xn, has a distribution. 
+The definition is quite straightforward. We define capital F of a as a function that answers the question,
+what proportion of the list is less than or equal to a. Because they are useful summaries, when the distribution 
+is approximately normal, we define the average and the standard deviation.
+A random variable x has a distribution function.To define this, we do not need a list of numbers.
+It’s a theoretical concept. In this case, to define the distribution, we define capital F of a as a function
+that answers the question, what is the probability that x is less than or equal to a. There is no list of numbers. 
+However, if x is defined by drawing from an urn with numbers in it,
+
+
+###Notation for Random Variables
+Data scientists talk about what could have been,
+but after we see what actually happened.
+
+
+
+###Central Limit Theorem
+The Central Limit Theorem–or the CLT for short tells us that when the number of independent 
+draws–also called sample size–is large, the probability distribution of the sum of 
+these draws is approximately normal.
+
+Previously, we discussed that if we know that the distribution
+of a list of numbers is approximated by the normal distribution,
+all we need to describe the list are the average and the standard deviation.
+
+We also know that the same applies to probability distributions.
+If a random variable has a probability distribution that
+is approximated with the normal distribution,
+then all we need to describe that probability distribution are
+the average and the standard deviation
+Referred to as the expected value  and the standard error SE.
+
+The first important concept to learn is the expected value
+
+A random variable will vary around an expected value in a way
+that if you take the average of many, many draws, the average of the draws
+will approximate the expected value.
+Getting closer and closer the more draws you take.
+
+Exercise 1. American Roulette probabilities
+An American roulette wheel has 18 red, 18 black, and 2 green pockets. Each red and black pocket is associated with
+a number from 1 to 36. The two remaining green slots feature “0” and “00”. Players place bets on which pocket they
+think a ball will land in after the wheel is spun. Players can bet on a specific number (0, 00, 1-36) or color
+(red, black, or green).
+What are the chances that the ball lands in a green pocket?
+# The variables `green`, `black`, and `red` contain the number of pockets for each color
+green <- 2
+black <- 18
+red <- 18
+# Assign a variable `p_green` as the probability of the ball landing in a green pocket
+p_green = green/(green+black+red)
+# Print the variable `p_green` to the console
+p_green
+
+Exercise 2. American Roulette payout
+In American roulette, the payout for winning on green is $17. This means that if you bet $1 and it lands on green,
+you get $17 as a prize.
+Create a model to predict your winnings from betting on green.
+# Use the `set.seed` function to make sure your answer matches the expected result after random sampling.
+set.seed(1)
+# The variables 'green', 'black', and 'red' contain the number of pockets for each color
+green <- 2
+black <- 18
+red <- 18
+# Assign a variable `p_green` as the probability of the ball landing in a green pocket
+p_green <- green / (green+black+red)
+# Assign a variable `p_not_green` as the probability of the ball not landing in a green pocket
+p_not_green <- 1-p_green
+# Create a model to predict the random variable `X`, your winnings from betting on green. Sample one time.
+X <- sample(c(17,-1), 1, replace = TRUE, prob=c(p_green, p_not_green))
+# Print the value of `X` to the console
+X
+
+Exercise 3. American Roulette expected value
+In American roulette, the payout for winning on green is $17. This means that if you bet $1 and it lands on green,
+you get $17 as a prize.In the previous exercise, you created a model to predict your winnings from betting on green.
+Now, compute the expected value of X, the random variable you generated previously.
+# The variables 'green', 'black', and 'red' contain the number of pockets for each color
+green <- 2
+black <- 18
+red <- 18
+# Assign a variable `p_green` as the probability of the ball landing in a green pocket
+p_green <- green / (green+black+red)
+# Assign a variable `p_not_green` as the probability of the ball not landing in a green pocket
+p_not_green <- 1-p_green
+# Calculate the expected outcome if you win $17 if the ball lands on green and you lose $1 if the ball doesn't
+land on green
+p_green * 17 + p_not_green * -1
+
+Exercise 4. American Roulette standard error
+The standard error of a random variable X tells us the difference between a random variable and its expected value.
+You calculated a random variable X in exercise 2 and the expected value of that random variable in exercise 3.
+Now, compute the standard error of that random variable, which represents a single outcome after one spin of the 
+roulette wheel.
+# The variables 'green', 'black', and 'red' contain the number of pockets for each color
+green <- 2
+black <- 18
+red <- 18
+# Assign a variable `p_green` as the probability of the ball landing in a green pocket
+p_green <- green / (green+black+red)
+# Assign a variable `p_not_green` as the probability of the ball not landing in a green pocket
+p_not_green <- 1-p_green
+# Compute the standard error of the random variable
+abs((17 - -1))*sqrt(p_green*p_not_green)
+
+Exercise 5. American Roulette sum of winnings
+You modeled the outcome of a single spin of the roulette wheel, X, in exercise 2.
+Now create a random variable S that sums your winnings after betting on green 1,000 times.
+# The variables 'green', 'black', and 'red' contain the number of pockets for each color
+green <- 2
+black <- 18
+red <- 18
+# Assign a variable `p_green` as the probability of the ball landing in a green pocket
+p_green <- green / (green+black+red)
+# Assign a variable `p_not_green` as the probability of the ball not landing in a green pocket
+p_not_green <- 1-p_green
+# Use the `set.seed` function to make sure your answer matches the expected result after random sampling
+set.seed(1)
+# Define the number of bets using the variable 'n'
+n <- 1000
+# Create a vector called 'X' that contains the outcomes of 1000 samples
+X <- sample(c(17,-1), size = n, replace=TRUE, prob=c(p_green, p_not_green))
+# Assign the sum of all 1000 outcomes to the variable 'S'
+S <- sum(X)
+# Print the value of 'S' to the console
+S
+
+Exercise 6. American Roulette winnings expected value
+In the previous exercise, you generated a vector of random outcomes, S, after betting on green 1,000 times.
+What is the expected value of S?
+# The variables 'green', 'black', and 'red' contain the number of pockets for each color
+green <- 2
+black <- 18
+red <- 18
+# Assign a variable `p_green` as the probability of the ball landing in a green pocket
+p_green <- green / (green+black+red)
+# Assign a variable `p_not_green` as the probability of the ball not landing in a green pocket
+p_not_green <- 1-p_green
+# Define the number of bets using the variable 'n'
+n <- 1000
+# Calculate the expected outcome of 1,000 spins if you win $17 when the ball lands on green and you lose $1 when the 
+ball doesn't land on green
+n * (p_green * 17 + p_not_green * -1)
+
+Exercise 7. American Roulette winnings expected value
+You generated the expected value of S, the outcomes of 1,000 bets that the ball lands in the green pocket, in the
+previous exercise.
+What is the standard error of S?
+# The variables 'green', 'black', and 'red' contain the number of pockets for each color
+green <- 2
+black <- 18
+red <- 18
+# Assign a variable `p_green` as the probability of the ball landing in a green pocket
+p_green <- green / (green+black+red)
+# Assign a variable `p_not_green` as the probability of the ball not landing in a green pocket
+p_not_green <- 1-p_green
+# Define the number of bets using the variable 'n'
+n <- 1000
+# Compute the standard error of the sum of 1,000 outcomes
+sqrt(n) * abs((17 + 1))*sqrt(p_green*p_not_green)
+
+
+The Central Limit Theorem Continued
+
+Averages and Proportions
+Property 1: The first, is that the expected value of a sum of random variables is the sum of the expected values of 
+the individual random variables.
+Prperty 2: is that the expected value of random variables times a non-random constant is the expected value times 
+that non-random constant.
+Property 3: is that the square of the standard error of the sum of independent random variables is the sum of the 
+square of the standard error of each random variable.
+Property 4: is that the standard error of random variables times a non-random constant is the standard error times
+a non-random constant.
+
+Law of Large Numbers
+A similar argument would be to say that red is due on roulette after seeing black come up five times in a row.
+These events are independent. So the chance of a coin landing heads is 50%, regardless of the previous five.
+Similarly for the roulette outcome. The law of averages applies only when the number of draws is very, very large, 
+not in small samples. After a million tosses, you will definitely see about 50% heads, regardless of what the first 
+five were.
+
+How Large is Large in CLT?
+In the Lottery: Yet, the number of winners, the sum of the draws, range between 0, and in very extreme cases, four. 
+This sum is certainly not well approximated by the normal distribution. So the central limit theorem doesn’t apply, 
+even with a very large sample size.
+This is generally true when the probability of success is very low. In these cases, the Poisson distribution is more 
+appropriate. We do not cover the theory here, but you can learn about the Poisson distribution in any probability 
+textbook and even Wikipedia.
+
+Exercise 1. American Roulette probability of winning money
+The exercises in the previous chapter explored winnings in American roulette. In this chapter of exercises, 
+we will continue with the roulette example and add in the Central Limit Theorem.
+In the previous chapter of exercises, you created a random variable S that is the sum of your winnings after betting 
+on green a number of times in American Roulette.
+What is the probability that you end up winning money if you bet on green 100 times?
+# Assign a variable `p_green` as the probability of the ball landing in a green pocket
+p_green <- 2 / 38
+# Assign a variable `p_not_green` as the probability of the ball not landing in a green pocket
+p_not_green <- 1-p_green
+# Define the number of bets using the variable 'n'
+n <- 100
+# Calculate 'avg', the expected outcome of 100 spins if you win $17 when the ball lands on green and you lose $1 
+when the ball doesn't land on green
+avg <- n * (17*p_green + -1*p_not_green)
+# Compute 'se', the standard error of the sum of 100 outcomes
+se <- sqrt(n) * (17 - -1)*sqrt(p_green*p_not_green)
+# Using the expected value 'avg' and standard error 'se', compute the probability that you win money betting on 
+green 100 times.
+1-pnorm(0,avg,se)
+
+Exercise 2. American Roulette Monte Carlo simulation
+Create a Monte Carlo simulation that generates 10,000 outcomes of S, the sum of 100 bets.
+Use the replicate function to replicate the sample code for B <- 10000 simulations.
+Within replicate, use the sample function to simulate n <- 100 outcomes of either a win (17)oraloss(-1) for the bet. 
+Use the order c(17, -1) and corresponding probabilities. Then, use the sum function to add up the winnings over all 
+iterations of the model. Make sure to include sum or DataCamp may crash with a “Session Expired” error.
+Use the mean function to compute the average winnings.
+Use the sd function to compute the standard deviation of the winnings
+Compute the average and standard deviation of the resulting list and compare them to the expected value (-5.263158) 
+and standard error (40.19344) for S that you calculated previously.
+# Assign a variable `p_green` as the probability of the ball landing in a green pocket
+p_green <- 2 / 38
+# Assign a variable `p_not_green` as the probability of the ball not landing in a green pocket
+p_not_green <- 1-p_green
+# Define the number of bets using the variable 'n'
+n <- 100
+# The variable `B` specifies the number of times we want the simulation to run. Let's run the Monte Carlo simulation 
+10,000 times.
+B <- 10000
+# Use the `set.seed` function to make sure your answer matches the expected result after random sampling.
+set.seed(1)
+# Create an object called `S` that replicates the sample code for `B` iterations and sums the outcomes.
+S <- replicate(B,{
+  X <- sample(c(17,-1), size = n, replace = TRUE, prob = c(p_green, p_not_green))
+  sum(X)
+})
+# Compute the average value for 'S'
+mean(S)
+# Calculate the standard deviation of 'S'
+sd(S)
+
+Exercise 3. American Roulette Monte Carlo vs CLT
+In this chapter, you calculated the probability of winning money in American roulette using the CLT.
+Now, calculate the probability of winning money from the Monte Carlo simulation. The Monte Carlo simulation from 
+the previous exercise has already been pre-run for you, resulting in the variable S that contains a list of 10,000 
+simulated outcomes.
+Use the mean function to calculate the probability of winning money from the Monte Carlo simulation, S
+# Calculate the proportion of outcomes in the vector `S` that exceed $0
+mean(S>0)
+
+
+Exercise 4. American Roulette Monte Carlo vs CLT comparison
+The Monte Carlo result and the CLT approximation for the probability of losing money 
+after 100 bets are close, but not that close. What could account for this?
+R. The CLT does not work as well when the probability of success is small.
+
+Exercise 5. American Roulette average winnings per bet
+Now create a random variable Y that contains your average winnings per bet after betting on green 10,000 times.
+Run a single Monte Carlo simulation of 10,000 bets using the following steps. (You do not need to replicate the 
+sample code.)
+Specify n as the number of times you want to sample from the possible outcomes.
+Use the sample function to return n values from a vector of possible values: winning $17 or losing $1. 
+Be sure to assign a probability to each outcome and indicate that you are sampling with replacement.
+Calculate the average result per bet placed using the mean function.
+# Use the `set.seed` function to make sure your answer matches the expected result after random sampling.
+set.seed(1)
+# Define the number of bets using the variable 'n'
+n <- 10000
+# Assign a variable `p_green` as the probability of the ball landing in a green pocket
+p_green <- 2 / 38
+# Assign a variable `p_not_green` as the probability of the ball not landing in a green pocket
+p_not_green <- 1 - p_green
+# Create a vector called `X` that contains the outcomes of `n` bets
+X <- sample(c(17,-1), size = n, replace = TRUE, prob = c(p_green, p_not_green))
+# Define a variable `Y` that contains the mean outcome per bet. Print this mean to the console.
+Y <- mean(X);Y
+
+Exercise 6. American Roulette per bet expected value
+What is the expected value of Y, the average outcome per bet after betting on green 10,000 times?
+Using the chances of winning $17 (p_green) and the chances of losing $1 (p_not_green), calculate the expected 
+outcome of a bet that the ball will land in a green pocket.
+Print this value to the console (do not assign it to a variable)  
+# Assign a variable `p_green` as the probability of the ball landing in a green pocket
+p_green <- 2 / 38
+# Assign a variable `p_not_green` as the probability of the ball not landing in a green pocket
+p_not_green <- 1 - p_green
+# Calculate the expected outcome of `Y`, the mean outcome per bet in 10,000 bets
+Y <- p_green * 17 + p_not_green * -1;Y  
+
+Exercise 7. American Roulette per bet standard error
+What is the standard error of Y, the average result of 10,000 spins?
+Compute the standard error of Y, the average result of 10,000 independent spins.
+# Define the number of bets using the variable 'n'
+n <- 10000
+# Assign a variable `p_green` as the probability of the ball landing in a green pocket
+p_green <- 2 / 38
+# Assign a variable `p_not_green` as the probability of the ball not landing in a green pocket
+p_not_green <- 1 - p_green
+# Compute the standard error of 'Y', the mean outcome per bet from 10,000 bets.
+abs((17 - (-1))*sqrt(p_green*p_not_green) / sqrt(n))
+
+Exercise 8. American Roulette winnings per game are positive
+What is the probability that your winnings are positive after betting on green 10,000 times?
+Execute the code that we wrote in previous exercises to determine the average and standard error.
+Use the pnorm function to determine the probability of winning more than $0
+# We defined the average using the following code
+avg <- 17*p_green + -1*p_not_green
+# We defined standard error using this equation
+se <- 1/sqrt(n) * (17 - -1)*sqrt(p_green*p_not_green)
+# Given this average and standard error, determine the probability of winning more than $0. 
+Print the result to the console.
+1 - pnorm(0, avg, se)
+
+Exercise 9. American Roulette Monte Carlo again
+Create a Monte Carlo simulation that generates 10,000 outcomes of S, the average outcome from 10,000 bets on green.
+Compute the average and standard deviation of the resulting list to confirm the results from previous exercises 
+using the Central Limit Theorem.
+Use the replicate function to model 10,000 iterations of a series of 10,000 bets.
+Each iteration inside replicate should simulate 10,000 bets and determine the average outcome of those 10,000 bets.
+If you forget to take the mean, DataCamp will crash with a “Session Expired” error.
+Find the average of the 10,000 average outcomes.
+Compute the standard deviation of the 10,000 simulations
+# The variable `n` specifies the number of independent bets on green
+n <- 10000
+# The variable `B` specifies the number of times we want the simulation to run
+B <- 10000
+# Use the `set.seed` function to make sure your answer matches the expected result after random number generation
+set.seed(1)
+# Generate a vector `S` that contains the the average outcomes of 10,000 bets modeled 10,000 times
+S <- replicate(B,{  
+  X <- sample(c(17,-1), size = n, replace = TRUE, prob = c(p_green, p_not_green))
+  mean(X)
+})
+# Compute the average of `S`
+mean(S)
+# Compute the standard deviation of `S`
+sd(S)
+
+Exercise 10. American Roulette comparison
+In a previous exercise, you found the probability of winning more than $0 after betting on green 10,000 times 
+using the Central Limit Theorem. Then, you used a Monte Carlo simulation to model the average result of betting
+on green 10,000 times over 10,000 simulated series of bets.
+What is the probability of winning more than $0 as estimated by your Monte Carlo simulation? 
+The code to generate the vector S that contains the the average outcomes of 10,000 bets modeled 10,000 times 
+has already been run for you.
+Calculate the probability of winning more than $0 in the Monte Carlo simulation from the previous exercise.
+You do not need to run another simulation: the results of the simulation are in your workspace as the vector S
+# Compute the proportion of outcomes in the vector 'S' where you won more than $0
+mean(S>0)
+
+Exercise 11. American Roulette comparison analysis
+The Monte Carlo result and the CLT approximation are now much closer than when we calculated the probability of 
+winning for 100 bets on green. What could account for this difference?
+R. The CLT works better when the sample size is larger
+
+
+
+####The Big Short
+####
+introduces you to the Big Short.
+
+understand the relationship between sampling models and interest rates as determined by banks.
+understand how interest rates can be set to minimize the chances of the bank losing money.
+understand how inappropriate assumptions of independence contributed to the financial meltdown of 2007.
+
+The Big Short
+Interest rates Explained
+Suppose your bank will give out 1,000 loans for 180,000 this year. Also suppose that your bank loses,
+after adding up all the costs, $200,000 per foreclosure. For simplicity, we assume that that includes 
+all operational costs. A sampling model for this scenario is coded like this.
+
+n <- 1000
+loss_per_foreclosure <- -200000
+p <- 0.02 
+defaults <- sample( c(0,1), n, prob=c(1-p, p), replace = TRUE)
+sum(defaults * loss_per_foreclosure)
+## [1] -2800000
+
+We either default and lose money, or not default and not lose money. If we run the 
+simulation we see that we lose $2.8 millions. Note that the total loss defined by 
+the final sum is a random variable. Every time you run the code you get a different
+answer. This is because it’s a probability of defaulting. It’s not going to happen 
+for sure. We can easily construct a Monte Carlo simulation to get an idea of the
+distribution of this random variable. Here’s the distribution.
+
+#Code: Interest rate Monte Carlo simulation
+B <- 10000
+losses <- replicate(B, {
+  defaults <- sample( c(0,1), n, prob=c(1-p, p), replace = TRUE) 
+  sum(defaults * loss_per_foreclosure)
+})
+#Code: Plotting expected losses
+library(tidyverse)
+data.frame(losses_in_millions = losses/10^6) %>% ggplot(aes(losses_in_millions)) +
+  geom_histogram(binwidth = 0.6, col = 'green')
+
+We don’t really need a Monte Carlo simulation though. Using what we’ve learned, 
+the CLT tells us that because our losses are a sum of independent draws, its 
+distribution is approximately normal with expected value and standard deviation given
+by the following formula.
+#Expected value and standard error of the sum of 1,000 loans
+n*(p*loss_per_foreclosure + (1-p)*0) # expected value   
+sqrt(n)*abs(loss_per_foreclosure)*sqrt(p*(1-p)) # standard error 
+
+We can now set an interest rate to guarantee that on average, we break even
+Basically, we need to add a quantity x to each loan, which in this case
+are represented by draws, so that the expected value is zero.
+That means breaking even
+
+#Code: Calculating interest rate for 1% probability of losing money
+l <- loss_per_foreclosure
+z <- qnorm(0.01)
+x <- -l*( n*p - z*sqrt(n*p*(1-p)))/ ( n*(1-p) + z*sqrt(n*p*(1-p)))
+# required profit when loan is not a foreclosure
+x    
+# interest rate
+x/180000*100    
+
+# expected value of the profit per loan
+loss_per_foreclosure*p + x*(1-p)    # expected value of the profit per loan
+
+# expected value of the profit over n loans
+n*(loss_per_foreclosure*p + x*(1-p)) # expected value of the profit over n loans
+
+we get that the x has to be about 6,249, which is an interest rate of about 3%, 
+which is still pretty good. Note also that by choosing this interest rate, we now 
+have an expected profit per loan of about $2,124, which is a total expected profit 
+of about $2 million. 
+We can run a Monte Carlo simulation and check our theoretical approximation. 
+We do that, and we indeed get that value again. And again, the 
+probability of profit being less than zero according to the Monte Carlo simulation 
+is about 1%.
+#Code: Monte Carlo simulation for 1% probability of losing money
+B <- 100000
+profit <- replicate(B, {
+  draws <- sample( c(x, loss_per_foreclosure), n, 
+                   prob=c(1-p, p), replace = TRUE) 
+  sum(draws)
+})
+mean(profit)    # expected value of the profit over n loans
+## [1] 2122535
+mean(profit<0)    # probability of losing money
+## [1] 0.01237    # about 1%
+
+The Big Short
+One of our employees points out that since the bank is making about $2,000 per loan, 
+that you should give out more loans. Why just n? You explain that finding those n 
+clients was hard. You need a group that is predictable, and that keeps the chances 
+of defaults low. 
+He then points out that even if the probability of default is higher,
+as long as your expected value is positive, you can minimize your chances of losing 
+money by increasing n, the number of loans, and relying on the law of large numbers. 
+He claims that even if the default rate is twice as high, say 4%, if we set the rate 
+just a bit higher so that this happens, you will get a positive expected value.
+
+So if we set the interest rate at 5%, we are guaranteed a positive expected value 
+of $640 per loan. And we can minimize our chances of losing money by simply 
+increasing the number of loans, since the probability of S being less than 0 is 
+equal to the probability of Z being less than negative expected value of S divided 
+by standard error S, with Z a standard normal random variable, as we saw earlier. 
+And if we do the math, we will see that we can pick an n so that this probability
+is 1 in 100.
+
+#Code: Expected value with higher default rate and interest rate
+p <- .04
+loss_per_foreclosure <- -200000
+r <- 0.05
+x <- r*180000
+loss_per_foreclosure*p + x*(1-p)
+## [1] 640
+#Code: Calculating number of loans for desired probability of losing money
+
+This is a form of the Law of Large Numbers.
+When n is large, our average earning per loan
+converges to the expected earning, mu
+#The number of loans required is:
+z <- qnorm(0.01)
+l <- loss_per_foreclosure
+n <- ceiling((z^2*(x-l)^2*p*(1-p))/(l*p + x*(1-p))^2)
+n    # number of loans required
+## [1] 22163
+This is the number of loans we need so that our probability of losing
+is about 1%
+
+# expected profit over n loans
+n*(loss_per_foreclosure*p + x * (1-p))    # expected profit over n loans
+## [1] 14184320
+
+#Code: Monte Carlo simulation with known default probability
+#This Monte Carlo simulation estimates the expected profit given a known probability of default . 
+Note that your results will differ from the video because the seed is not set.
+B <- 10000
+p <- 0.04
+x <- 0.05 * 180000
+profit <- replicate(B, {
+  draws <- sample( c(x, loss_per_foreclosure), n, 
+                   prob=c(1-p, p), replace = TRUE) 
+  sum(draws)
+})
+mean(profit)
+## [1] 14090646
+
+#This seems like a no brainer.
+#Your colleague decides to leave your bank,
+#and start his own high-risk mortgage company.
+#A few months later, your colleague's bank has gone bankrupt.
+#A book is written about it and eventually, a movie
+#made relating to the mistake your friend and many others made.
+#What happened?
+
+#by making n large, we minimize the standard error of our per-loan profit.
+#However, for this rule to hold, the X's must be independent draws.
+#The fact that one person defaults must be independent
+#of other people defaultin
+
+#To construct a more realistic simulation than the original one your friend ran,
+#let's assume there could be a global event that
+#affects everybody with high-risk mortgages,
+#and changes their probability.
+#We will assume that with a 50-50 chance, all the probabilities go up or down
+#slightly to somewhere between 0.03 and 0.05.
+#But it happens to everybody at once, not just one person.
+#These draws are no longer independent.
+#Let's use a Monte Carlo simulation to see what happens under this model.
+
+#Code: Monte Carlo simulation with unknown default probability
+#This Monte Carlo simulation estimates the expected profit given an unknown probability of default , 
+modeling the situation where an event changes the probability of default for all borrowers simultaneously. 
+Note that your results will differ from the video because the seed is not set.
+p <- 0.04
+x <- 0.05*180000
+profit <- replicate(B, {
+  new_p <- 0.04 + sample(seq(-0.01, 0.01, length = 100), 1)
+  draws <- sample( c(x, loss_per_foreclosure), n, 
+                   prob=c(1-new_p, new_p), replace = TRUE) 
+  sum(draws)
+})
+mean(profit)    # expected profit
+## [1] 14109623
+mean(profit < 0)    # probability of losing money
+## [1] 0.3524
+mean(profit < -10000000)    # probability of losing over $10 million
+## [1] 0.2409
+
+#However, the probability of the bank having negative earning
+#shoots way up to almost 35%.
+#Even scarier is the probability of losing more than $10 million,
+#which is 24%.
+#To understand how this happens, we can look at the distribution
+#of our random variable.
+#It doesn't look normal at all.
+#The theory completely breaks down, and our random variable has much more
+#variability than expected.
+#The financial meltdown of 2007 was due, among other things,
+#to financial experts assuming independence when there was none.
+
+#The Central Limit Theorem states that the sum of independent draws of a random 
+#variable follows a normal distribution. However, when the draws are not independent, 
+#this assumption does not hold.
+
+#Assessment7: The Big Short
+
+#1.Bank earnings
+#Say you manage a bank that gives out 10,000 loans. 
+The default rate is 0.03 and you lose $200,000 in each foreclosure.
+#Create a random variable S that contains the earnings of your bank. 
+Calculate the total amount of money lost in this scenario.
+#Using the sample function, generate a vector called defaults that contains n samples from a vector of c(0,1), 
+where 0 indicates a payment and 1 indicates a default
+#Multiply the total number of defaults by the loss per foreclosure.
+# Assign the number of loans to the variable `n`
+n <- 10000
+# Assign the loss per foreclosure to the variable `loss_per_foreclosure`
+loss_per_foreclosure <- -200000
+# Assign the probability of default to the variable `p_default`
+p_default <- 0.03
+# Use the `set.seed` function to make sure your answer matches the expected result after random sampling
+set.seed(1)
+# Generate a vector called `defaults` that contains the default outcomes of `n` loans
+defaults <- sample( c(0,1), n, replace = TRUE, prob=c(1-p_default, p_default))
+
+# Generate `S`, the total amount of money lost across all foreclosures. Print the value to the console.
+S <- sum(defaults * loss_per_foreclosure)
+S
+## [1] -6.3e+07
+
+
+2.Bank earnings Monte Carlo
+Run a Monte Carlo simulation with 10,000 outcomes for S, the sum of losses over 10,000 loans. 
+Make a histogram of the results.
+Within a replicate loop with 10,000 iterations, use sample to generate a list of 10,000 loan outcomes: 
+payment (0) or default (1). Use the outcome order c(0,1) and probability of default p_default.
+Still within the loop, use the function sum to count the number of foreclosures multiplied by 
+loss_per_foreclosure to return the sum of all losses across the 10,000 loans. If you do not take 
+the sum inside the replicate loop, DataCamp may crash with a “Session Expired” error.
+Plot the histogram of values using the function hist.
+# Assign the number of loans to the variable `n`
+n <- 10000
+# Assign the loss per foreclosure to the variable `loss_per_foreclosure`
+loss_per_foreclosure <- -200000
+# Assign the probability of default to the variable `p_default`
+p_default <- 0.03
+# Use the `set.seed` function to make sure your answer matches the expected result after random sampling
+set.seed(1)
+# The variable `B` specifies the number of times we want the simulation to run
+B <- 10000
+# Generate a list of summed losses 'S'. Replicate the code from the previous exercise over 'B' iterations 
+to generate a list of summed losses for 'n' loans.  Ignore any warnings for now.
+S <- replicate(B, {
+  defaults <- sample( c(0,1), n, prob=c(1-p_default, p_default), replace = TRUE) 
+  sum(defaults * loss_per_foreclosure)
+})
+# Plot a histogram of 'S'.  Ignore any warnings for now.
+hist(S)
+
+
+3.Bank earnings expected value
+What is the expected value of S, the sum of losses over 10,000 loans? For now, assume a bank makes no money 
+if the loan is paid.
+Using the chances of default (p_default), calculate the expected losses over 10,000 loans.
+# Assign the number of loans to the variable `n`
+n <- 10000
+# Assign the loss per foreclosure to the variable `loss_per_foreclosure`
+loss_per_foreclosure <- -200000
+# Assign the probability of default to the variable `p_default`
+p_default <- 0.03
+# Calculate the expected loss due to default out of 10,000 loans
+n*(p_default*loss_per_foreclosure + (1-p_default)*0)
+## [1] -6e+07
+
+
+4.Bank earnings standard error
+What is the standard error of S?
+  Compute the standard error of the random variable S you generated in the previous exercise, 
+  the summed outcomes of 10,000 loans.
+# Assign the number of loans to the variable `n`
+n <- 10000
+
+# Assign the loss per foreclosure to the variable `loss_per_foreclosure`
+loss_per_foreclosure <- -200000
+
+# Assign the probability of default to the variable `p_default`
+p_default <- 0.03
+
+# Compute the standard error of the sum of 10,000 loans
+sqrt(n) * abs(loss_per_foreclosure) * sqrt(p_default*(1 - p_default))
+## [1] 3411744
+
+
+5.Bank earnings interest rate - 1
+So far, we’ve been assuming that we make no money when people pay their loans and we lose a lot of money
+when people default on their loans. Assume we give out loans for $180,000. How much money do we need to make
+when people pay their loans so that our net loss is $0?
+In other words, what interest rate do we need to charge in order to not lose money?
+  
+If the amount of money lost or gained equals 0, the probability of default times the total loss per default equals
+the amount earned per probability of the loan being paid.
+Divide the total amount needed per loan by the loan amount to determine the interest rate.
+# Assign the loss per foreclosure to the variable `loss_per_foreclosure`
+loss_per_foreclosure <- -200000
+
+# Assign the probability of default to the variable `p_default`
+p_default <- 0.03
+
+# Assign a variable `x` as the total amount necessary to have an expected outcome of $0
+x <- -(loss_per_foreclosure*p_default) / (1 - p_default)
+
+# Convert `x` to a rate, given that the loan amount is $180,000. Print this value to the console.
+x / 180000
+## [1] 0.03436426
+
+
+6.Bank earnings interest rate - 2
+With the interest rate calculated in the last example, we still lose money 50% of the time. What should the 
+interest rate be so that the chance of losing money is 1 in 20?
+  In math notation, what should the interest rate be so that Pr(S<0)=0.05?
+  
+  Remember that we can add a constant to both sides of the equation to get:
+  Pr(S−E[S]SE[S]<−E[S]SE[S])
+
+which is
+
+  Pr(Z<−[lp+x(1−p)]n(x−l)np(1−p)−−−−−−−−√)=0.05
+Let z = qnorm(0.05) give us the value of z for which:
+  Pr(Z≤z)=0.05
+ 
+Use the qnorm function to compute a continuous variable at given quantile of the distribution to solve for z.
+In this equation, l, p, and n are known values. Once you’ve solved for z, solve for x.
+Divide x by the loan amount to calculate the rate.
+# Assign the number of loans to the variable `n`
+n <- 10000
+
+# Assign the loss per foreclosure to the variable `loss_per_foreclosure`
+loss_per_foreclosure <- -200000
+
+# Assign the probability of default to the variable `p_default`
+p_default <- 0.03
+
+# Generate a variable `z` using the `qnorm` function
+z <- qnorm(0.05)
+
+# Generate a variable `x` using `z`, `p_default`, `loss_per_foreclosure`, and `n`
+x <- -loss_per_foreclosure*( n*p_default - z*sqrt(n*p_default*(1 - p_default)))/ ( n*(1 - p_default) + z*sqrt(n*p_default*(1 - p_default)))
+
+# Convert `x` to an interest rate, given that the loan amount is $180,000. Print this value to the console.
+x / 180000
+## [1] 0.03768738
+
+
+7.Bank earnings - minimize money loss
+The bank wants to minimize the probability of losing money. Which of the following 
+achieves their goal without making interest rates go up?
+A. A smaller pool of loans
+
+B. A larger probability of default
+
+C. A reduced default rate
+
+D. A larger cost per loan default
+
+Answer C
+
+
+
