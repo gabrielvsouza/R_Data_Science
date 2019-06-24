@@ -1,0 +1,196 @@
+Bayesian Statistics
+
+
+Apply Bayes' theorem to calculate the probability of A given B.
+Understand how to use hierarchical models to make better predictions by considering multiple levels of variability.
+Compute a posterior probability using an empirical Bayesian approach.
+Calculate a 95% credible interval from a posterior probability.
+
+
+Bayesian statistics is a theory in the field of statistics based on the Bayesian interpretation of probability 
+where probability expresses a degree of belief in an event. The degree of belief may be based on prior knowledge 
+about the event, such as the results of previous experiments, or on personal beliefs about the event. 
+This differs from a number of other interpretations of probability, such as the frequentist interpretation that 
+views probability as the limit of the relative frequency of an event after a large number of trials
+
+
+Bayesian statistical methods use Bayes' theorem to compute and update probabilities after obtaining new data. 
+Bayes' theorem describes the conditional probability of an event based on data as well as prior information or 
+beliefs about the event or conditions related to the event. For example, in Bayesian inference, Bayes' theorem 
+can be used to estimate the parameters of a probability distribution or statistical model. Since Bayesian statistics
+treats probability as a degree of belief, Bayes' theorem can directly assign a probability distribution that quantifies
+the belief to the parameter or set of parameters
+
+
+Bayesian Statistics continues to remain incomprehensible in the ignited minds of many analysts. Being amazed by the 
+incredible power of machine learning, a lot of us have become unfaithful to statistics. Our focus has narrowed down 
+to exploring machine learning.
+
+We fail to understand that machine learning is not the only way to solve real world problems. In several situations, 
+it does not help us solve business problems, even though there is data involved in these problems. To say the least, 
+knowledge of statistics will allow you to work on complex analytical problems, irrespective of the size of data.
+
+In 1770s, Thomas Bayes introduced ‘Bayes Theorem’. Even after centuries later, the importance of ‘Bayesian Statistics’ 
+hasn’t faded away. In fact, today this topic is being taught in great depths in some of the world’s leading universities.
+
+Frequentist Statistics
+    The Inherent Flaws in Frequentist Statistics
+    Bayesian Statistics
+      Conditional Probability
+      Bayes Theorem
+Bayesian Inference
+    Bernoulli likelihood function
+    Prior Belief Distribution
+    Posterior belief Distribution
+Test for Significance – Frequentist vs Bayesian
+    p-value
+    Confidence Intervals
+    Bayes Factor
+    High Density Interval (HDI)
+
+Frequentist Statistics
+Frequentist inference is a type of statistical inference that draws conclusions from sample data by emphasizing 
+the frequency or proportion of the data. An alternative name is frequentist statistics.
+This is the inference framework in which the well-established methodologies of statistical hypothesis testing and 
+confidence intervals are based. Other than frequentistic inference, the main alternative approach to statistical 
+inference is Bayesian inference, while another is fiducial inference
+
+While "Bayesian inference" is sometimes held to include the approach to inference leading to optimal decisions, 
+a more restricted view is taken here for simplicity
+
+Frequentist Statistics tests whether an event (hypothesis) occurs or not. It calculates the probability of an event
+in the long run of the experiment (i.e the experiment is repeated under the same conditions to obtain the outcome).
+
+Here, the sampling distributions of fixed size are taken. Then, the experiment is theoretically repeated infinite number
+of times but practically done with a stopping intention. For example, I perform an experiment with a stopping intention 
+in mind that I will stop the experiment when it is repeated 1000 times or I see minimum 300 heads in a coin toss.
+
+Let’s go deeper now
+Now, we’ll understand frequentist statistics using an example of coin toss. The objective is to estimate the fairness 
+of the coin. Below is a table representing the frequency of heads:
+
+We know that probability of getting a head on tossing a fair coin is 0.5. No. of heads represents the actual number 
+of heads obtained. Difference is the difference between 0.5*(No. of tosses) - no. of heads.
+
+An important thing is to note that, though the difference between the actual number of heads and expected number 
+of heads( 50% of number of tosses) increases as the number of tosses are increased, the proportion of number of 
+heads to total number of tosses approaches 0.5 (for a fair coin).
+
+This experiment presents us with a very common flaw found in frequentist approach i.e. Dependence of the result of
+an experiment on the number of times the experiment is repeate
+
+
+
+The Inherent Flaws in Frequentist Statistics
+Till here, we’ve seen just one flaw in frequentist statistics. Well, it’s just the beginning.
+
+20th century saw a massive upsurge in the frequentist statistics being applied to numerical models to check whether 
+one sample is different from the other, a parameter is important enough to be kept in the model and variousother  
+manifestations of hypothesis testing. But frequentist statistics suffered some great flaws in its design and interpretation
+which posed a serious concern in all real life problems. For example:
+
+1. p-values measured against a sample (fixed size) statistic with some stopping intention changes with change in 
+intention and sample size. i.e If two persons work on the same data and have different stopping intention, 
+they may get two different  p- values for the same data, which is undesirable.
+
+For example: Person A may choose to stop tossing a coin when the total count reaches 100 while B stops at 1000. For different sample sizes, we get different t-scores and different p-values. Similarly, intention to stop may change from fixed number of flips to total duration of flipping. In this case too, we are bound to get different p-values.
+
+2- Confidence Interval (C.I) like p-value depends heavily on the sample size. This makes the stopping potential absolutely absurd since no matter how many persons perform the tests on the same data, the results should be consistent.
+
+3- Confidence Intervals (C.I) are not probability distributions therefore they do not provide the most probable value for a parameter and the most probable values.
+
+These three reasons are enough to get you going into thinking about the drawbacks of the frequentist approach and why is there a need for bayesian approach. Let’s find it out.
+
+From here, we’ll first understand the basics of Bayesian Statistics.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
