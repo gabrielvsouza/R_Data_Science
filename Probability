@@ -86,8 +86,7 @@ Pr(Card 2 is a king∣Card 1 is a king) = 3/51
 Pr(A∣B) = Pr(A)
 
 ## Multiplication rule 
-#If we want to know the probability of two events, say A and B, occurring, 
-#we can use the multiplication rule:
+#If we want to know the probability of two events, say A and B, occurring, we can use the multiplication rule:
 Pr(A and B)=Pr(A)Pr(B∣A)
 #Let’s use Blackjack as an example. In Blackjack, you are assigned two random cards. 
 #After you see what you have, you can ask for more. The goal is to get closer to 21 
@@ -1602,7 +1601,6 @@ B. A larger probability of default
 C. A reduced default rate
 
 D. A larger cost per loan default
-
 Answer C
 
 
