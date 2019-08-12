@@ -44,9 +44,55 @@ and generating the report simultaneously.
 
 Git is what we refer to as a version control system.
 
+https://rafalab.github.io/dsbook/git.html#github-repos
+
 Git is a version control system, tracking changes and coordinating the editing of code.
 GitHub is a hosting system for code, which can help with your career profile.
 Git is most effectively used with Unix, but can also work with Rstudio.
+
+sudo apt install git
+
+Sign up for a GitHub account, with a name that is professional, short, and easy to remember
+Connect to RStudio: global options > Git/SVM, enter the path to git executables
+To avoid typing our GitHub password every time, we create a SSHRSA key automatically through RStudio with 
+the create RSA key button.
+
+To create a new GitHub repository and link it to an RStudio project, follow 2 steps:
+Step 1: Initialize a new repo on GitHub by clicking repository > new > choose a descriptive name.
+Step 2: Connect to RStudio (next video).
+
+One of the advantages of keeping code on a GitHub repository is that you can easily share it with potential employers.
+Because many data science companies use version control systems like Git to collaborate on projects, they might also
+be impressed that you already know at least the basics.
+
+The first step in creating a repo for your code
+is to initialize one on GitHub.
+Because you already created an account, you can go to the URL,
+GitHub.com/yourusername.
+
+You now have your first repo on GitHub.
+Now we're going to connect it to RStudio.
+So to do this, it is convenient to copy the link provided
+by GitHub specifically to connect this repo using Git.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
