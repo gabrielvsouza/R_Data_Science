@@ -457,7 +457,7 @@ weather6$events[weather6$events == ""] <- "None"
 # Print the first 6 rows of weather6
 head(weather6)
 # Your data are now tidy and in an easy format for others to examine!
-
+#
 
 
 
