@@ -1,0 +1,170 @@
+
+library(tidyverse)
+
+# set working directory
+path_loc <- "/home/gvs/R/Rbasics"
+setwd(path_loc)
+
+# reading in the data
+df <- read_csv("telecom.csv")
+
+# taking a quick look
+glimpse(df)
+View(df)
+
+=-=-=-=-=-=-=-=-=-=-=-=-=
+  
+  
+# Standard Missing Values
+
+# looking at MonthlyCharges
+df$MonthlyCharges
+is.na(df$MonthlyCharges)
+
+# using the help function to learn about NA
+help(NA)
+
+# looking at the distinct values
+df %>%
+  distinct(MonthlyCharges)
+
+# counting unique values
+df %>%
+  summarise(n = n_distinct(MonthlyCharges))
+
+df %>%
+  summarise(n = n_distinct(PaymentMethod))
+
+# counting missing values
+df %>%
+  summarise(count = sum(is.na(MonthlyCharges)))
+
+#Maybe we want to do multiple things at once. Let’s say we want to get a 
+#count of unique values, as well as missing values, and also the median 
+#value of MonthlyCharges.
+
+# counting unique, missing, and median values
+df %>% summarise(n = n_distinct(MonthlyCharges),
+                 na = sum(is.na(MonthlyCharges)),
+                 med = median(MonthlyCharges, na.rm = TRUE))
+
+#Now that we’ve identified the missing values, let’s replace them with 
+#the median value of MonthlyCharges
+
+# mutate missing values
+df %>%
+  mutate(MonthlyCharges
+         = replace(MonthlyCharges,
+                   is.na(MonthlyCharges),
+                   median(MonthlyCharges, na.rm = TRUE)))
+
+#Just to double check that this worked, lets print out the whole tibble 
+#again.
+df
+
+#It looks like all the missing values are back. So what happened?
+
+#To permanently modify the data, we need to assign the mutate to the 
+#original data using the assignment operator <-
+
+# mutate missing values, and modify the dataframe
+df <- df %>%
+  mutate(MonthlyCharges = replace(MonthlyCharges,
+                                  is.na(MonthlyCharges),
+                                  median(MonthlyCharges, na.rm = TRUE)))
+df
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  
+# Non-Standard Missing Values
+
+# looking at missing values
+df$TotalCharges
+is.na(df$TotalCharges)
+
+# Let’s use the summarise function to see how many missing values R found.
+# counting missing values
+df %>%
+  summarise(count = sum(is.na(TotalCharges)))
+
+#use the mutate function to replace these with the correct missing value 
+#types. Keep in mind that we need to use the assignment operator to make 
+#sure the changes are permanent.
+
+# replacing with standard missing value type, NA
+df <- df %>%
+  mutate(TotalCharges = replace(TotalCharges, TotalCharges == "na", NA)) %>%
+  mutate(TotalCharges = replace(TotalCharges, TotalCharges == "N/A", NA))
+
+# taking another look
+df$TotalCharges
+is.na(df$TotalCharges)
+
+#Now we can see that R picked up all three missing values.
+#Before we replace the missing values, there’s still another problem.
+#R thinks that the column values are characters. We can confirm this 
+#with the glimpse function.
+
+glimpse(df$TotalCharges)
+
+# Let’s change these to numeric types.
+# changing to numeric type
+df$TotalCharges <- as.numeric(df$TotalCharges)
+glimpse(df$TotalCharges)
+
+# let’s finish up by replacing the missing values with the median.
+# replace missing values with median
+df <- df %>%
+  mutate(TotalCharges = replace(TotalCharges,
+                                is.na(TotalCharges),
+                                median(TotalCharges, na.rm = T)))
+df$TotalCharges
+
+
+#An even simpler way to change all of the missing values is to change 
+#the column to numeric before doing anything else.
+
+# importing the data again
+df <- read_csv("telecom.csv")
+df$TotalCharges
+
+# change TotalCharges to numeric type
+df$TotalCharges <- as.numeric(df$TotalCharges)
+df$TotalCharges
+
+# This time all of the different missing value types were changed automatically.
+
+=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
+# More Missing Values
+
+# manually entering in data and chose to use “--” for missing values.
+# Take a look at the PayementMethod column
+
+# looking at PaymentMethod
+df$PaymentMethod
+is.na(df$PaymentMethod)
+
+# R was only to identify one of the missing values, the empty cell.
+# Let’s go ahead and use mutate to change “--" to NA.
+
+# replacing "--" with NA
+df <- df %>%
+  mutate(PaymentMethod = replace(PaymentMethod, PaymentMethod ==  "--", NA))
+is.na(df$PaymentMethod)
+df$PaymentMethod
+
+# What about dealing with missing values in a column of character types?
+# Since all of the entries in the PaymentMethod column are strings, 
+# there’s no median value.
+# Rather than just exclude the missing values, let’s convert the NAs 
+# to a new category, called “unavailable”.
+
+# replace NA with "unavailable"
+df <- df %>%
+  mutate(PaymentMethod = replace(PaymentMethod, is.na(PaymentMethod), "unavailable"))
+
+df$PaymentMethod
+
