@@ -1,3 +1,4 @@
+
 #Tidying Data
 #bmi <- read.csv("bmi_clean.csv")
 
@@ -237,6 +238,7 @@ complete.cases(social_df)
 # Use na.omit() to remove all rows with any missing values
 na.omit(social_df)
 
+
 #Dealing with outliers and obvious errors
 
 # Look at a summary() of students3
@@ -253,6 +255,7 @@ hist(students3$absences, right = FALSE)
 boxplot(students3$age)
 # View a boxplot of absences
 boxplot(students3$absences)
+
 
 #
 ##
