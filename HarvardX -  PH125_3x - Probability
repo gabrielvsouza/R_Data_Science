@@ -1,3 +1,4 @@
+#
 #HarvardX: PH125.3x
 #Data Science: Probability
 
@@ -1567,6 +1568,7 @@ which is
   Pr(Z<−[lp+x(1−p)]n(x−l)np(1−p)−−−−−−−−√)=0.05
 Let z = qnorm(0.05) give us the value of z for which:
   Pr(Z≤z)=0.05
+ 
  
 Use the qnorm function to compute a continuous variable at given quantile of the distribution to solve for z.
 In this equation, l, p, and n are known values. Once you’ve solved for z, solve for x.
