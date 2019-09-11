@@ -1,0 +1,21 @@
+How you can to write a basic for loop in R
+
+Loop
+
+1.
+for (year in c(2019,2020,2021,2022,2023)){
+  print(paste("Year ", year))
+}
+
+2.
+for (year in 2019:2023){
+  print(paste("Year ", year))
+}
+
+3. Next
+for (i in 1:10) {
+  if (!i %% 2){
+    next
+  }
+    print(i)
+}
